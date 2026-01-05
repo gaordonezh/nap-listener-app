@@ -108,6 +108,12 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
+  fun syncNow(promise: Promise) {
+    NotificationSyncWorker.enqueueManual(reactApplicationContext)
+    promise.resolve(true)
+  }
+
+  @ReactMethod
   fun isListenerEnabled(promise: Promise) {
     try {
       val enabled = NotificationListenerUtils.isEnabled(reactContext)

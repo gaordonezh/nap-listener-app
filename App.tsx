@@ -1,20 +1,9 @@
 import React, { useEffect, useState, useCallback, Fragment } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  NativeModules,
-  NativeEventEmitter,
-  StyleSheet,
-  AppState,
-  Switch,
-  Image,
-  Alert,
-} from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, NativeModules, NativeEventEmitter, StyleSheet, AppState, Switch, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { defaultAllowedApps } from './src/utils/constants';
 import Button from './src/components/Button';
+import { sleep } from './src/utils/functions';
 
 const { NotificationModule } = NativeModules;
 
@@ -46,9 +35,7 @@ export default function App() {
     try {
       const granted = await NotificationModule.hasNotificationPermission();
       setHasPermission(granted);
-      if (granted) {
-        loadNotifications(true);
-      }
+      loadNotifications(true, granted);
     } catch (e) {
       console.error('Error verificando permiso', e);
     }
@@ -59,16 +46,16 @@ export default function App() {
   };
 
   const loadNotifications = useCallback(
-    async (reset: boolean = false) => {
-      if (loading || !hasPermission) return;
+    async (reset?: boolean, defaultPerms?: boolean) => {
+      const perms = typeof defaultPerms === 'boolean' ? defaultPerms : hasPermission;
+      if (loading || !perms) return;
 
       setLoading(true);
 
       try {
         const currentOffset = reset ? 0 : offset;
 
-        const data: NotificationItem[] =
-          await NotificationModule.getNotifications(PAGE_SIZE, currentOffset);
+        const data: NotificationItem[] = await NotificationModule.getNotifications(PAGE_SIZE, currentOffset);
 
         setNotifications(prev => (reset ? data : [...prev, ...data]));
 
@@ -151,8 +138,8 @@ export default function App() {
   const onSync = async () => {
     try {
       setSyncing(true);
-      await NotificationModule.triggerSync();
-      await new Promise(resolve => setTimeout(() => resolve(true), 1000));
+      await NotificationModule.syncNow();
+      await sleep(1000);
       Alert.alert('Sincronización', 'Envío iniciado');
     } catch {
       Alert.alert('Error', 'No se pudo sincronizar');
@@ -175,32 +162,16 @@ export default function App() {
 
             <View style={styles.permissionHeader}>
               <Text style={styles.allowedListLabel}>Listener:</Text>
-              <Text style={styles.allowedListLabel}>
-                {listenerEnabled ? '🟢 Activo' : '🔴 Inactivo'}
-              </Text>
+              <Text style={styles.allowedListLabel}>{listenerEnabled ? '🟢 Activo' : '🔴 Inactivo'}</Text>
               {listenerEnabled ? null : (
-                <Button
-                  size="small"
-                  variant="transparent"
-                  label="Activar"
-                  onPress={() => NotificationModule.openListenerSettings()}
-                />
+                <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.openListenerSettings()} />
               )}
             </View>
 
             <View style={[styles.permissionHeader, { marginTop: 8 }]}>
               <Text style={styles.allowedListLabel}>Sincronización:</Text>
-              <Text style={styles.allowedListLabel}>
-                {syncActive ? '🟢 Activo' : '🔴 Inactivo'}
-              </Text>
-              {syncActive ? null : (
-                <Button
-                  size="small"
-                  variant="transparent"
-                  label="Activar"
-                  onPress={() => NotificationModule.triggerSync()}
-                />
-              )}
+              <Text style={styles.allowedListLabel}>{syncActive ? '🟢 Activo' : '🔴 Inactivo'}</Text>
+              {syncActive ? null : <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.triggerSync()} />}
             </View>
 
             <View style={styles.divider} />
@@ -209,13 +180,8 @@ export default function App() {
               {defaultAllowedApps.map((item, index) => (
                 <View key={index + 1} style={styles.allowedList}>
                   <Image src={item.imgUrl} style={styles.allowedImg} />
-                  <Text style={[styles.allowedListLabel, { flex: 1 }]}>
-                    {item.name}
-                  </Text>
-                  <Switch
-                    value={allowed.has(item.package)}
-                    onValueChange={() => handleSetPackages([item.package])}
-                  />
+                  <Text style={[styles.allowedListLabel, { flex: 1 }]}>{item.name}</Text>
+                  <Switch value={allowed.has(item.package)} onValueChange={() => handleSetPackages([item.package])} />
                 </View>
               ))}
             </View>
@@ -223,16 +189,9 @@ export default function App() {
         ) : (
           <Fragment>
             <Text style={styles.permissionTitle}>Permiso requerido</Text>
-            <Text style={styles.permissionText}>
-              NapListener necesita acceso a las notificaciones para funcionar
-              correctamente.
-            </Text>
+            <Text style={styles.permissionText}>NapListener necesita acceso a las notificaciones para funcionar correctamente.</Text>
 
-            <Button
-              size="large"
-              label="Conceder permiso"
-              onPress={openPermissionSettings}
-            />
+            <Button size="large" label="Conceder permiso" onPress={openPermissionSettings} />
           </Fragment>
         )}
       </View>
@@ -245,9 +204,7 @@ export default function App() {
             <View style={styles.card}>
               <View style={styles.header}>
                 <Text style={styles.title}>{item.title || '—'}</Text>
-                <Text style={styles.event}>
-                  {new Date(item.timestamp).toLocaleString()}
-                </Text>
+                <Text style={styles.event}>{new Date(item.timestamp).toLocaleString()}</Text>
               </View>
               <Text style={styles.text}>{item.text || '—'}</Text>
               <Text style={styles.app}>{getAppName(item.packageName)}</Text>
@@ -260,9 +217,7 @@ export default function App() {
             setRefreshing(true);
             loadNotifications(true);
           }}
-          ListFooterComponent={
-            loading ? <ActivityIndicator style={{ margin: 16 }} /> : null
-          }
+          ListFooterComponent={loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
         />
       ) : null}
     </SafeAreaView>

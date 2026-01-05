@@ -7,8 +7,6 @@ import retrofit2.http.POST
 
 interface ApiService {
 
-    // @POST("events") fun sendNotifications(@Body notifications: List<NotificationDto>): Call<Unit>
-
     @POST("events") suspend fun sendNotifications(@Body notifications: List<NotificationDto>)
 }
 

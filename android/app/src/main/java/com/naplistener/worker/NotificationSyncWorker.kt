@@ -3,6 +3,7 @@ package com.naplistener.worker
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -47,6 +48,12 @@ class NotificationSyncWorker(context: Context, params: WorkerParameters) :
                             ExistingPeriodicWorkPolicy.UPDATE,
                             request
                     )
+        }
+
+        fun enqueueManual(context: Context) {
+            val request = OneTimeWorkRequestBuilder<NotificationSyncWorker>().build()
+
+            WorkManager.getInstance(context).enqueue(request)
         }
     }
 }
