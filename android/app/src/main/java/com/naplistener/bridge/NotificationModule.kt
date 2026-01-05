@@ -6,7 +6,9 @@ import android.provider.Settings
 import com.facebook.react.bridge.*
 import com.naplistener.db.AppDatabase
 import com.naplistener.notification.AllowedAppsStore
+import com.naplistener.notification.NotificationListenerUtils
 import com.naplistener.worker.NotificationSyncWorker
+import com.naplistener.worker.WorkStatusUtils
 
 class NotificationModule(private val reactContext: ReactApplicationContext) :
         ReactContextBaseJavaModule(reactContext) {
@@ -85,10 +87,14 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun getAllowedPackages(promise: Promise) {
-    val list = AllowedAppsStore.getAllowed(reactContext).toList()
-    val array = Arguments.createArray()
-    list.forEach { array.pushString(it) }
-    promise.resolve(array)
+    try {
+      val list = AllowedAppsStore.getAllowed(reactContext).toList()
+      val array = Arguments.createArray()
+      list.forEach { array.pushString(it) }
+      promise.resolve(array)
+    } catch (e: Exception) {
+      promise.reject("GET_ALLOWED_ERROR", e)
+    }
   }
 
   @ReactMethod
@@ -98,6 +104,35 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
       promise.resolve(true)
     } catch (e: Exception) {
       promise.reject("SYNC_ERROR", e)
+    }
+  }
+
+  @ReactMethod
+  fun isListenerEnabled(promise: Promise) {
+    try {
+      val enabled = NotificationListenerUtils.isEnabled(reactContext)
+      promise.resolve(enabled)
+    } catch (e: Exception) {
+      promise.reject("LISTENER_STATUS_ERROR", e)
+    }
+  }
+
+  @ReactMethod
+  fun openListenerSettings() {
+    val intent =
+            Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+    reactContext.startActivity(intent)
+  }
+
+  @ReactMethod
+  fun isSyncActive(promise: Promise) {
+    try {
+      val active = WorkStatusUtils.isSyncScheduled(reactContext)
+      promise.resolve(active)
+    } catch (e: Exception) {
+      promise.reject("SYNC_STATUS_ERROR", e)
     }
   }
 }

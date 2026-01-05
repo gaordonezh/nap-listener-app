@@ -31,6 +31,7 @@ class MainApplication : Application(), ReactApplication {
 
     scheduleCleanupWorker(this)
     scheduleSyncWorker(this)
+    NotificationSyncWorker.enqueue(this)
   }
 
   private fun scheduleCleanupWorker(context: Context) {

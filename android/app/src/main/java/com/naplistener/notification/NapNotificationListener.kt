@@ -22,6 +22,7 @@ class NapNotificationListener : NotificationListenerService() {
         super.onListenerDisconnected()
         Log.e("NapListener", "NotificationListener DISCONNECTED")
         requestRebind(ComponentName(this, NapNotificationListener::class.java))
+        NotificationEventEmitter.notifyStatus("DISCONNECTED")
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {

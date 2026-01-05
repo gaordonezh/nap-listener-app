@@ -1,16 +1,18 @@
 package com.naplistener.worker
 
 import android.content.Context
-import android.util.Log
 import androidx.work.CoroutineWorker
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.naplistener.db.AppDatabase
 import com.naplistener.notification.ApiClient
 import com.naplistener.notification.toDto
+import java.util.concurrent.TimeUnit
 
-class NotificationSyncWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+class NotificationSyncWorker(context: Context, params: WorkerParameters) :
+        CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
         val dao = AppDatabase.get(applicationContext).notificationDao()
@@ -33,10 +35,18 @@ class NotificationSyncWorker(context: Context, params: WorkerParameters) : Corou
 
     companion object {
 
-        fun enqueue(context: Context) {
-            val request = OneTimeWorkRequestBuilder<NotificationSyncWorker>().build()
+        const val UNIQUE_NAME = "notification_sync"
 
-            WorkManager.getInstance(context).enqueue(request)
+        fun enqueue(context: Context) {
+            val request =
+                    PeriodicWorkRequestBuilder<NotificationSyncWorker>(30, TimeUnit.MINUTES).build()
+
+            WorkManager.getInstance(context)
+                    .enqueueUniquePeriodicWork(
+                            UNIQUE_NAME,
+                            ExistingPeriodicWorkPolicy.UPDATE,
+                            request
+                    )
         }
     }
 }

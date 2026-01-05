@@ -36,8 +36,10 @@ export default function App() {
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [allowed, setAllowed] = useState<Set<string>>(new Set());
+  const [listenerEnabled, setListenerEnabled] = useState<boolean>(false);
+  const [syncActive, setSyncActive] = useState<boolean>(false);
   const [syncing, setSyncing] = useState(false);
 
   const checkPermission = useCallback(async () => {
@@ -58,7 +60,7 @@ export default function App() {
 
   const loadNotifications = useCallback(
     async (reset: boolean = false) => {
-      if (loading || hasPermission === false) return;
+      if (loading || !hasPermission) return;
 
       setLoading(true);
 
@@ -82,11 +84,11 @@ export default function App() {
   );
 
   useEffect(() => {
-    handleSetPackages([]);
-    // handleSetPackages(defaultAllowedApps.map(item => item.package));
+    initAllowedApps();
+    loadStatus();
 
-    const sub = emitter.addListener('listenerStatus', status => {
-      console.log('Listener status:', status);
+    const sub = emitter.addListener('listener_status', status => {
+      setSyncActive(status === 'CONNECTED');
     });
 
     return () => sub.remove();
@@ -108,14 +110,25 @@ export default function App() {
   }, [checkPermission, loadNotifications]);
 
   useEffect(() => {
-    const emitter = new NativeEventEmitter(NotificationModule);
-
     const subscription = emitter.addListener('notifications_changed', () => {
       loadNotifications(true);
     });
 
     return () => subscription.remove();
   }, [loadNotifications]);
+
+  const loadStatus = async () => {
+    const listener = await NotificationModule.isListenerEnabled();
+    const sync = await NotificationModule.isSyncActive();
+
+    setSyncActive(sync);
+    setListenerEnabled(listener);
+  };
+
+  const initAllowedApps = async () => {
+    const res: Array<string> = await NotificationModule.getAllowedPackages();
+    handleSetPackages(res);
+  };
 
   const handleSetPackages = (pkgs: Array<string>) => {
     const next = new Set(allowed);
@@ -158,11 +171,47 @@ export default function App() {
               <Button loading={syncing} label="Force Sync" onPress={onSync} />
             </View>
 
+            <View style={styles.divider} />
+
+            <View style={styles.permissionHeader}>
+              <Text style={styles.allowedListLabel}>Listener:</Text>
+              <Text style={styles.allowedListLabel}>
+                {listenerEnabled ? '🟢 Activo' : '🔴 Inactivo'}
+              </Text>
+              {listenerEnabled ? null : (
+                <Button
+                  size="small"
+                  variant="transparent"
+                  label="Activar"
+                  onPress={() => NotificationModule.openListenerSettings()}
+                />
+              )}
+            </View>
+
+            <View style={[styles.permissionHeader, { marginTop: 8 }]}>
+              <Text style={styles.allowedListLabel}>Sincronización:</Text>
+              <Text style={styles.allowedListLabel}>
+                {syncActive ? '🟢 Activo' : '🔴 Inactivo'}
+              </Text>
+              {syncActive ? null : (
+                <Button
+                  size="small"
+                  variant="transparent"
+                  label="Activar"
+                  onPress={() => NotificationModule.triggerSync()}
+                />
+              )}
+            </View>
+
+            <View style={styles.divider} />
+
             <View style={styles.allowedContainer}>
               {defaultAllowedApps.map((item, index) => (
                 <View key={index + 1} style={styles.allowedList}>
                   <Image src={item.imgUrl} style={styles.allowedImg} />
-                  <Text style={styles.allowedListLabel}>{item.name}</Text>
+                  <Text style={[styles.allowedListLabel, { flex: 1 }]}>
+                    {item.name}
+                  </Text>
                   <Switch
                     value={allowed.has(item.package)}
                     onValueChange={() => handleSetPackages([item.package])}
@@ -225,6 +274,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#0f172a',
   },
+  divider: {
+    borderBottomWidth: 1,
+    borderColor: '#2f2f2f',
+    marginTop: 16,
+    marginBottom: 16,
+  },
   permissionBox: {
     padding: 24,
     margin: 24,
@@ -245,11 +300,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   allowedContainer: {
-    marginTop: 20,
-    paddingTop: 20,
     gap: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#2f2f2f',
   },
   allowedList: {
     flexDirection: 'row',
@@ -264,7 +315,6 @@ const styles = StyleSheet.create({
   allowedListLabel: {
     fontSize: 14,
     color: '#ffffff',
-    flex: 1,
   },
   permissionText: {
     color: '#cbd5f5',

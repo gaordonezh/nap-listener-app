@@ -18,17 +18,18 @@ object NotificationEventEmitter {
                       return
                     }
 
-    context.getJSModule(
-                    com.facebook.react.modules.core.DeviceEventManagerModule
-                                    .RCTDeviceEventEmitter::class
-                            .java
-            )
+    context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
             .emit("notifications_changed", null)
   }
 
   fun notifyStatus(status: String) {
-    reactContext
-            ?.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
-            ?.emit("listenerStatus", status)
+    val context =
+            reactContext
+                    ?: run {
+                      return
+                    }
+
+    context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            .emit("listener_status", status)
   }
 }
