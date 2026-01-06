@@ -11,5 +11,6 @@ data class NotificationEntity(
         val text: String?,
         val timestamp: Long,
         val eventType: String,
+        val userName: String?,
         val sent: Boolean = false
 )

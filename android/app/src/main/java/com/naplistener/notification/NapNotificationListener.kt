@@ -6,6 +6,7 @@ import android.service.notification.StatusBarNotification
 import android.util.Log
 import com.naplistener.bridge.NotificationEventEmitter
 import com.naplistener.db.NotificationEntity
+import com.naplistener.user.UserStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -39,13 +40,16 @@ class NapNotificationListener : NotificationListenerService() {
 
             if (title.isNullOrBlank() && text.isNullOrBlank()) return
 
+            val userName = UserStore.getName(applicationContext)
+
             val entity =
                     NotificationEntity(
                             packageName = sbn.packageName,
                             title = title,
                             text = text,
                             timestamp = System.currentTimeMillis(),
-                            eventType = "POSTED"
+                            eventType = "POSTED",
+                            userName = userName
                     )
 
             CoroutineScope(Dispatchers.IO).launch {

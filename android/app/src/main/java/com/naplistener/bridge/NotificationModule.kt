@@ -7,6 +7,7 @@ import com.facebook.react.bridge.*
 import com.naplistener.db.AppDatabase
 import com.naplistener.notification.AllowedAppsStore
 import com.naplistener.notification.NotificationListenerUtils
+import com.naplistener.user.UserStore
 import com.naplistener.worker.NotificationSyncWorker
 import com.naplistener.worker.WorkStatusUtils
 
@@ -109,7 +110,7 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun syncNow(promise: Promise) {
-    NotificationSyncWorker.enqueueManual(reactApplicationContext)
+    NotificationSyncWorker.enqueueManual(reactContext)
     promise.resolve(true)
   }
 
@@ -140,5 +141,16 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
     } catch (e: Exception) {
       promise.reject("SYNC_STATUS_ERROR", e)
     }
+  }
+
+  @ReactMethod
+  fun saveUserName(name: String, promise: Promise) {
+    UserStore.saveName(reactContext, name)
+    promise.resolve(true)
+  }
+
+  @ReactMethod
+  fun getUserName(promise: Promise) {
+    promise.resolve(UserStore.getName(reactContext))
   }
 }

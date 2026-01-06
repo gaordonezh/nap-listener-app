@@ -1,18 +1,6 @@
 import React, { ReactNode } from 'react';
-import {
-  ActivityIndicator,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  TouchableOpacityProps,
-} from 'react-native';
-import {
-  ERROR_COLOR,
-  INFO_COLOR,
-  MAIN_COLOR,
-  SUCCESS_COLOR,
-  WARNING_COLOR,
-} from '../utils/constants';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, TouchableOpacityProps } from 'react-native';
+import { ERROR_COLOR, INFO_COLOR, MAIN_COLOR, SUCCESS_COLOR, WARNING_COLOR } from '../utils/constants';
 
 interface ButtonProps extends TouchableOpacityProps {
   label?: ReactNode;
@@ -31,20 +19,12 @@ const buttonColors = {
 };
 
 const sizes = {
-  large: { height: 50 },
-  normal: { height: 40 },
-  small: { height: 30 },
+  large: { height: 50, paddingHorizontal: 20 },
+  normal: { height: 40, paddingHorizontal: 16 },
+  small: { height: 30, paddingHorizontal: 12 },
 };
 
-const Button = ({
-  style,
-  label,
-  color = 'main',
-  variant = 'filled',
-  size = 'normal',
-  loading,
-  ...rest
-}: ButtonProps) => {
+const Button = ({ style, label, color = 'main', variant = 'filled', size = 'normal', loading, ...rest }: ButtonProps) => {
   const currentColor = buttonColors[color];
   const currentSize = sizes[size];
 
@@ -88,7 +68,6 @@ const Button = ({
         {
           display: 'flex',
           alignItems: 'center',
-          paddingHorizontal: 10,
           justifyContent: 'center',
         },
         style,
@@ -97,10 +76,7 @@ const Button = ({
       {...rest}
     >
       {loading ? (
-        <ActivityIndicator
-          size={currentSize.height - 15}
-          style={{ paddingHorizontal: 20 }}
-        />
+        <ActivityIndicator size={currentSize.height - 15} style={{ paddingHorizontal: 20 }} />
       ) : (
         <Text style={[variantClasses.text, styles.buttonText]}>{label}</Text>
       )}

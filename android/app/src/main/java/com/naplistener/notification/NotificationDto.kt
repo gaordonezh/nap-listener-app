@@ -6,7 +6,8 @@ data class NotificationDto(
         val packageName: String,
         val title: String?,
         val text: String?,
-        val timestamp: Long
+        val timestamp: Long,
+        val phone: String?
 )
 
 fun NotificationEntity.toDto() =
@@ -14,5 +15,6 @@ fun NotificationEntity.toDto() =
                 packageName = packageName,
                 title = title,
                 text = text,
-                timestamp = timestamp
+                timestamp = timestamp,
+                phone = userName
         )
