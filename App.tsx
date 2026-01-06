@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, Fragment } from 'react';
-import { View, Text, FlatList, ActivityIndicator, NativeModules, NativeEventEmitter, StyleSheet, AppState, Switch, Image, Alert } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, NativeModules, NativeEventEmitter, StyleSheet, AppState, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { defaultAllowedApps } from './src/utils/constants';
+import { appsImage } from './src/utils/constants';
 import Button from './src/components/Button';
 import { sleep } from './src/utils/functions';
 
@@ -17,8 +17,6 @@ type NotificationItem = {
   timestamp: number;
   eventType: string;
 };
-
-const PAGE_SIZE = 20;
 
 export default function App() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
@@ -41,10 +39,6 @@ export default function App() {
     }
   }, []);
 
-  const openPermissionSettings = () => {
-    NotificationModule.openNotificationSettings();
-  };
-
   const loadNotifications = useCallback(
     async (reset?: boolean, defaultPerms?: boolean) => {
       const perms = typeof defaultPerms === 'boolean' ? defaultPerms : hasPermission;
@@ -55,7 +49,7 @@ export default function App() {
       try {
         const currentOffset = reset ? 0 : offset;
 
-        const data: NotificationItem[] = await NotificationModule.getNotifications(PAGE_SIZE, currentOffset);
+        const data: NotificationItem[] = await NotificationModule.getNotifications(20, currentOffset);
 
         setNotifications(prev => (reset ? data : [...prev, ...data]));
 
@@ -113,8 +107,8 @@ export default function App() {
   };
 
   const initAllowedApps = async () => {
-    const res: Array<string> = await NotificationModule.getAllowedPackages();
-    handleSetPackages(res);
+    // const res: Array<string> = await NotificationModule.getAllowedPackages();
+    handleSetPackages(['com.whatsapp', 'com.bcp.innovacxion.yapeapp']);
   };
 
   const handleSetPackages = (pkgs: Array<string>) => {
@@ -127,12 +121,6 @@ export default function App() {
 
     setAllowed(next);
     NotificationModule.setAllowedPackages(Array.from(next));
-  };
-
-  const getAppName = (pkg: string): string => {
-    const finder = defaultAllowedApps.find(item => item.package === pkg);
-    if (!finder) return pkg;
-    return finder.name;
   };
 
   const onSync = async () => {
@@ -154,7 +142,11 @@ export default function App() {
         {hasPermission ? (
           <Fragment>
             <View style={styles.permissionHeader}>
-              <Text style={styles.permissionTitle}>Apps a la escucha</Text>
+              <View style={styles.allowedImgContainer}>
+                {Array.from(allowed).map(item => (
+                  <Image key={item} src={appsImage[item as keyof typeof appsImage]} style={styles.allowedImg} />
+                ))}
+              </View>
               <Button loading={syncing} label="Force Sync" onPress={onSync} />
             </View>
 
@@ -173,25 +165,13 @@ export default function App() {
               <Text style={styles.allowedListLabel}>{syncActive ? '🟢 Activo' : '🔴 Inactivo'}</Text>
               {syncActive ? null : <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.triggerSync()} />}
             </View>
-
-            <View style={styles.divider} />
-
-            <View style={styles.allowedContainer}>
-              {defaultAllowedApps.map((item, index) => (
-                <View key={index + 1} style={styles.allowedList}>
-                  <Image src={item.imgUrl} style={styles.allowedImg} />
-                  <Text style={[styles.allowedListLabel, { flex: 1 }]}>{item.name}</Text>
-                  <Switch value={allowed.has(item.package)} onValueChange={() => handleSetPackages([item.package])} />
-                </View>
-              ))}
-            </View>
           </Fragment>
         ) : (
           <Fragment>
             <Text style={styles.permissionTitle}>Permiso requerido</Text>
             <Text style={styles.permissionText}>NapListener necesita acceso a las notificaciones para funcionar correctamente.</Text>
 
-            <Button size="large" label="Conceder permiso" onPress={openPermissionSettings} />
+            <Button size="large" label="Conceder permiso" onPress={() => NotificationModule.openNotificationSettings()} />
           </Fragment>
         )}
       </View>
@@ -207,7 +187,7 @@ export default function App() {
                 <Text style={styles.event}>{new Date(item.timestamp).toLocaleString()}</Text>
               </View>
               <Text style={styles.text}>{item.text || '—'}</Text>
-              <Text style={styles.app}>{getAppName(item.packageName)}</Text>
+              <Text style={styles.app}>{item.packageName}</Text>
             </View>
           )}
           onEndReached={() => loadNotifications()}
@@ -254,17 +234,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
   },
-  allowedContainer: {
-    gap: 10,
-  },
-  allowedList: {
+  allowedImgContainer: {
+    display: 'flex',
     flexDirection: 'row',
-    alignItems: 'center',
     gap: 8,
   },
   allowedImg: {
-    height: 25,
-    width: 25,
+    height: 40,
+    width: 40,
     borderRadius: 4,
   },
   allowedListLabel: {
@@ -287,7 +264,7 @@ const styles = StyleSheet.create({
   },
   app: {
     color: '#38bdf8',
-    fontSize: 12,
+    fontSize: 10,
   },
   event: {
     color: '#94a3b8',
