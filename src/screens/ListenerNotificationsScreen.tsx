@@ -109,6 +109,7 @@ const ListenerNotificationsScreen = () => {
 
   const initAllowedApps = async () => {
     // const res: Array<string> = await NotificationModule.getAllowedPackages();
+    // handleSetPackages([]);
     handleSetPackages(['com.whatsapp', 'com.bcp.innovacxion.yapeapp']);
   };
 
