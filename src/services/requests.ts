@@ -1,13 +1,20 @@
+import { NativeModules } from 'react-native';
 import { ClientProps } from '../types/global';
 
-export const handleGetClientData = async (phoneNumber: string): Promise<ClientProps> => {
-  const params = new URLSearchParams({ phone: phoneNumber });
-  const response = await fetch(`http://192.168.1.202:5001/clients?${params.toString()}`);
-  if (!response.ok) throw new Error(`HTTP error request: ${response.status}`);
+export const handleGetClientData = async (phoneNumber: string): Promise<null | ClientProps> => {
+  try {
+    const baseUrl: string = await NativeModules.NotificationModule.getApiBaseUrl();
 
-  const data: Array<ClientProps> = await response.json();
+    const response = await fetch(`${baseUrl}/clients/${phoneNumber}`);
+    if (!response.ok) throw new Error(`HTTP error request: ${response.status}`);
 
-  if (!data.length) throw new Error('Cliente no encontrado');
+    const data: ClientProps = await response.json();
 
-  return data[0];
+    if (!data) throw new Error('Cliente no encontrado');
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 };

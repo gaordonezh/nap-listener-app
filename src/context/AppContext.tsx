@@ -31,9 +31,10 @@ const AppContextProvider = () => {
 
       const phoneSaved: string = await NativeModules.NotificationModule.getUserName();
       const isValid = phoneNumberUtils.valid(phoneSaved);
-      if (!isValid) return;
+      if (!isValid) throw new Error('NOT FOUND 1');
 
       const client = await handleGetClientData(phoneSaved);
+      if (!client) throw new Error('NOT FOUND 2');
 
       setCurrentClient(client);
     } catch (error) {
