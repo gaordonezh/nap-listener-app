@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, Fragment } from 'react';
 import { View, Text, FlatList, ActivityIndicator, NativeModules, NativeEventEmitter, StyleSheet, AppState, Image, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { appsImage } from '../utils/constants';
+import { appsImage, whatsappPackageName, yapePackageName } from '../utils/constants';
 import Button from '../components/Button';
 import { sleep } from '../utils/functions';
 import Empty from '../components/Empty';
@@ -19,13 +19,15 @@ type NotificationItem = {
   eventType: string;
 };
 
+const counters = { first: 0, second: 0 };
+
 const ListenerNotificationsScreen = () => {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean>(false);
-  const [allowed, setAllowed] = useState<Set<string>>(new Set());
+  const [allowed, setAllowed] = useState<Array<string>>([]);
   const [listenerEnabled, setListenerEnabled] = useState<boolean>(false);
   const [syncActive, setSyncActive] = useState<boolean>(false);
   const [syncing, setSyncing] = useState(false);
@@ -108,21 +110,14 @@ const ListenerNotificationsScreen = () => {
   };
 
   const initAllowedApps = async () => {
+    // await handleSetPackages([]);
+    await handleSetPackages([yapePackageName]);
     // const res: Array<string> = await NotificationModule.getAllowedPackages();
-    // handleSetPackages([]);
-    handleSetPackages(['com.whatsapp', 'com.bcp.innovacxion.yapeapp']);
   };
 
-  const handleSetPackages = (pkgs: Array<string>) => {
-    const next = new Set(allowed);
-
-    for (const pkg of pkgs) {
-      if (next.has(pkg)) next.delete(pkg);
-      else next.add(pkg);
-    }
-
-    setAllowed(next);
-    NotificationModule.setAllowedPackages(Array.from(next));
+  const handleSetPackages = async (pkgs: Array<string>) => {
+    setAllowed(pkgs);
+    await NotificationModule.setAllowedPackages(pkgs);
   };
 
   const onSync = async () => {
@@ -135,6 +130,17 @@ const ListenerNotificationsScreen = () => {
       Alert.alert('Error', 'No se pudo sincronizar');
     } finally {
       setSyncing(false);
+    }
+  };
+
+  const handleCounter = (key: keyof typeof counters) => {
+    counters[key]++;
+
+    if (counters.first === 5 && counters.second === 5) {
+      handleSetPackages([yapePackageName, whatsappPackageName]);
+    }
+    if (counters.first > 5 && counters.second > 5) {
+      handleSetPackages([yapePackageName]);
     }
   };
 
@@ -159,7 +165,9 @@ const ListenerNotificationsScreen = () => {
             <View style={styles.divider} />
 
             <View style={styles.permissionHeader}>
-              <Text style={styles.allowedListLabel}>Listener:</Text>
+              <Text style={styles.allowedListLabel} onPress={() => handleCounter('first')}>
+                Listener:
+              </Text>
               <Text style={styles.allowedListLabel}>{listenerEnabled ? '🟢 Activo' : '🔴 Inactivo'}</Text>
               {listenerEnabled ? null : (
                 <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.openListenerSettings()} />
@@ -167,7 +175,9 @@ const ListenerNotificationsScreen = () => {
             </View>
 
             <View style={[styles.permissionHeader, { marginTop: 8 }]}>
-              <Text style={styles.allowedListLabel}>Sincronización:</Text>
+              <Text style={styles.allowedListLabel} onPress={() => handleCounter('second')}>
+                Sincronización:
+              </Text>
               <Text style={styles.allowedListLabel}>{syncActive ? '🟢 Activo' : '🔴 Inactivo'}</Text>
               {syncActive ? null : <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.triggerSync()} />}
             </View>

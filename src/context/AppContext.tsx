@@ -22,7 +22,6 @@ const AppContextProvider = () => {
 
   useEffect(() => {
     verifyClient();
-    // eslint-disable-next-line
   }, []);
 
   const verifyClient = async () => {

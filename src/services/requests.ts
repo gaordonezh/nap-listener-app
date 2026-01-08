@@ -14,7 +14,6 @@ export const handleGetClientData = async (phoneNumber: string): Promise<null | C
 
     return data;
   } catch (error) {
-    console.log(error);
     return null;
   }
 };

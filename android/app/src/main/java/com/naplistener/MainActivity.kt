@@ -7,7 +7,7 @@ import com.facebook.react.defaults.DefaultReactActivityDelegate
 
 class MainActivity : ReactActivity() {
 
-  override fun getMainComponentName(): String = "NapListener"
+  override fun getMainComponentName(): String = "Nap Listener"
 
   override fun createReactActivityDelegate(): ReactActivityDelegate =
           DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
