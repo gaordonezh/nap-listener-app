@@ -1,5 +1,6 @@
 package com.naplistener.notification
 
+import com.naplistener.BuildConfig
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -7,13 +8,13 @@ import retrofit2.http.POST
 
 interface ApiService {
 
-    @POST("events") suspend fun sendNotifications(@Body notifications: List<NotificationDto>)
+    @POST("/events") suspend fun sendNotifications(@Body notifications: List<NotificationDto>)
 }
 
 object ApiClient {
     private val retrofit =
             Retrofit.Builder()
-                    .baseUrl("http://192.168.1.202:5001/")
+                    .baseUrl(BuildConfig.API_BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build()
 

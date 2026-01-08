@@ -4,6 +4,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.provider.Settings
 import com.facebook.react.bridge.*
+import com.naplistener.BuildConfig
 import com.naplistener.db.AppDatabase
 import com.naplistener.notification.AllowedAppsStore
 import com.naplistener.notification.NotificationListenerUtils
@@ -152,5 +153,10 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
   @ReactMethod
   fun getUserName(promise: Promise) {
     promise.resolve(UserStore.getName(reactContext))
+  }
+
+  @ReactMethod
+  fun getApiBaseUrl(promise: Promise) {
+    promise.resolve(BuildConfig.API_BASE_URL)
   }
 }
