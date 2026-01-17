@@ -37,6 +37,7 @@ const AppContextProvider = () => {
 
       setCurrentClient(client);
     } catch (error) {
+      console.log(error);
       await NativeModules.NotificationModule.saveUserName('-');
     } finally {
       setLoading(false);

@@ -21,7 +21,7 @@ const Input = ({ label, style, prefix, errorMessage, ...props }: InputProps) => 
         style={[styles.input, style, { backgroundColor: props.editable === false ? '#c2c2c2' : '#fff' }]}
       />
     </View>
-    {errorMessage ? <Text style={{ color: 'red', fontSize: 12 }}>{errorMessage}</Text> : null}
+    {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
   </View>
 );
 
@@ -59,5 +59,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     color: '#000',
     fontSize: 16,
+  },
+  error: {
+    color: 'red',
+    fontSize: 12,
   },
 });

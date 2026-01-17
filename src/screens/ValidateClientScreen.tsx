@@ -32,7 +32,7 @@ const ValidateClientScreen = () => {
   return (
     <SafeAreaView style={[styles.container, { height }]}>
       <ScrollView>
-        <View style={{ flex: 1, gap: 32 }}>
+        <View style={styles.fullScreen}>
           <View style={{ height: height - 500 }}>
             <Text style={styles.title}>Nap Listener</Text>
             <Text style={styles.subtitle}>Bienvenido</Text>
@@ -83,5 +83,9 @@ const styles = StyleSheet.create({
   inputPrefix: {
     fontSize: 16,
     color: '#2f2f2f',
+  },
+  fullScreen: {
+    flex: 1,
+    gap: 32,
   },
 });

@@ -62,21 +62,9 @@ const Button = ({ style, label, color = 'main', variant = 'filled', size = 'norm
   const variantClasses = buttonVariants[variant];
 
   return (
-    <TouchableOpacity
-      style={[
-        variantClasses.container,
-        {
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        style,
-      ]}
-      disabled={rest.disabled || loading}
-      {...rest}
-    >
+    <TouchableOpacity style={[variantClasses.container, style]} disabled={rest.disabled || loading} {...rest}>
       {loading ? (
-        <ActivityIndicator size={currentSize.height - 15} style={{ paddingHorizontal: 20 }} />
+        <ActivityIndicator size={currentSize.height - 15} style={styles.indicator} />
       ) : (
         <Text style={[variantClasses.text, styles.buttonText]}>{label}</Text>
       )}
@@ -90,10 +78,16 @@ const styles = StyleSheet.create({
   button: {
     alignSelf: 'center',
     borderRadius: 7,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   buttonText: {
     fontSize: 18,
     textAlign: 'center',
     fontWeight: '600',
+  },
+  indicator: {
+    paddingHorizontal: 20,
   },
 });

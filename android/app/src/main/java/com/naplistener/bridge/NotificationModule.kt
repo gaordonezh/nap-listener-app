@@ -2,12 +2,16 @@ package com.naplistener.bridge
 
 import android.content.ComponentName
 import android.content.Intent
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import com.facebook.react.bridge.*
 import com.naplistener.BuildConfig
 import com.naplistener.db.AppDatabase
 import com.naplistener.notification.AllowedAppsStore
+import com.naplistener.notification.ListenerProbeState
 import com.naplistener.notification.NotificationListenerUtils
+import com.naplistener.probe.ProbeService
 import com.naplistener.user.UserStore
 import com.naplistener.worker.NotificationSyncWorker
 import com.naplistener.worker.WorkStatusUtils
@@ -158,5 +162,16 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
   @ReactMethod
   fun getApiBaseUrl(promise: Promise) {
     promise.resolve(BuildConfig.API_BASE_URL)
+  }
+
+  @ReactMethod
+  fun verifyListener(promise: Promise) {
+    ListenerProbeState.received = false
+
+    val intent = Intent(reactContext, ProbeService::class.java)
+    reactContext.startService(intent)
+
+    Handler(Looper.getMainLooper())
+            .postDelayed({ promise.resolve(ListenerProbeState.received) }, 3000)
   }
 }

@@ -27,6 +27,14 @@ class NapNotificationListener : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
+
+        val title = sbn.notification.extras.getString("android.title")
+
+        if (title == "Nap Listener Health") {
+            ListenerProbeState.received = true
+            return
+        }
+
         if (!AllowedAppsStore.isAllowed(applicationContext, sbn.packageName)) {
             return
         }

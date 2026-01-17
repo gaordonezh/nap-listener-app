@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useCallback, Fragment } from 'react';
-import { View, Text, FlatList, ActivityIndicator, NativeModules, NativeEventEmitter, StyleSheet, AppState, Image, Alert } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, FlatList, ActivityIndicator, NativeModules, NativeEventEmitter, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { appsImage, whatsappPackageName, yapePackageName } from '../utils/constants';
 import Button from '../components/Button';
 import { sleep } from '../utils/functions';
 import Empty from '../components/Empty';
+import { usePermissionsContext } from '../context/PermissionsContext';
 
 const { NotificationModule } = NativeModules;
 
@@ -19,33 +20,22 @@ type NotificationItem = {
   eventType: string;
 };
 
-const counters = { first: 0, second: 0 };
+const counter = { value: 0 };
 
 const ListenerNotificationsScreen = () => {
+  const { requestNotificationPermission } = usePermissionsContext();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [hasPermission, setHasPermission] = useState<boolean>(false);
   const [allowed, setAllowed] = useState<Array<string>>([]);
   const [listenerEnabled, setListenerEnabled] = useState<boolean>(false);
   const [syncActive, setSyncActive] = useState<boolean>(false);
   const [syncing, setSyncing] = useState(false);
 
-  const checkPermission = useCallback(async () => {
-    try {
-      const granted = await NotificationModule.hasNotificationPermission();
-      setHasPermission(granted);
-      loadNotifications(true, granted);
-    } catch (e) {
-      console.error('Error verificando permiso', e);
-    }
-  }, []);
-
   const loadNotifications = useCallback(
-    async (reset?: boolean, defaultPerms?: boolean) => {
-      const perms = typeof defaultPerms === 'boolean' ? defaultPerms : hasPermission;
-      if (loading || !perms) return;
+    async (reset?: boolean) => {
+      if (loading) return;
 
       setLoading(true);
 
@@ -64,7 +54,7 @@ const ListenerNotificationsScreen = () => {
         setRefreshing(false);
       }
     },
-    [offset, loading, hasPermission],
+    [offset, loading],
   );
 
   useEffect(() => {
@@ -79,19 +69,8 @@ const ListenerNotificationsScreen = () => {
   }, []);
 
   useEffect(() => {
-    checkPermission();
+    requestNotificationPermission();
   }, []);
-
-  useEffect(() => {
-    const sub = AppState.addEventListener('change', state => {
-      if (state === 'active') {
-        checkPermission();
-        loadNotifications(true);
-      }
-    });
-
-    return () => sub.remove();
-  }, [checkPermission, loadNotifications]);
 
   useEffect(() => {
     const subscription = emitter.addListener('notifications_changed', () => {
@@ -99,7 +78,7 @@ const ListenerNotificationsScreen = () => {
     });
 
     return () => subscription.remove();
-  }, [loadNotifications]);
+  }, []);
 
   const loadStatus = async () => {
     const listener = await NotificationModule.isListenerEnabled();
@@ -133,95 +112,98 @@ const ListenerNotificationsScreen = () => {
     }
   };
 
-  const handleCounter = (key: keyof typeof counters) => {
-    counters[key]++;
-
-    if (counters.first === 5 && counters.second === 5) {
+  const handleCounter = () => {
+    counter.value++;
+    if (counter.value === 20) {
       handleSetPackages([yapePackageName, whatsappPackageName]);
     }
-    if (counters.first > 5 && counters.second > 5) {
+    if (counter.value === 25) {
       handleSetPackages([yapePackageName]);
+    }
+  };
+
+  const verifyStatus = async () => {
+    try {
+      setSyncing(true);
+
+      const ok = await NotificationModule.verifyListener();
+      if (!ok) throw new Error('NOT FOUND');
+
+      Alert.alert('OK', 'Listener funcionando correctamente');
+    } catch (error: any) {
+      Alert.alert(
+        'Listener detenido',
+        'Se intentó reactivar automáticamente. Si el problema persiste, revisa permisos y batería. ' + String(error.message),
+      );
+    } finally {
+      setSyncing(false);
     }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.permissionBox}>
-        {hasPermission ? (
-          <Fragment>
-            <View style={styles.permissionHeader}>
-              {Array.from(allowed).length ? (
-                <View style={styles.allowedImgContainer}>
-                  {Array.from(allowed).map(item => (
-                    <Image key={item} src={appsImage[item as keyof typeof appsImage]} style={styles.allowedImg} />
-                  ))}
-                </View>
-              ) : (
-                <Text style={{ color: '#fff' }}>Todas las apps en escucha</Text>
-              )}
-              <Button loading={syncing} label="Force Sync" onPress={onSync} />
-            </View>
+        <View style={styles.permissionHeader}>
+          {Array.from(allowed).length ? (
+            <TouchableOpacity style={styles.allowedImgContainer} onPress={handleCounter} activeOpacity={1}>
+              {Array.from(allowed).map(item => (
+                <Image key={item} src={appsImage[item as keyof typeof appsImage]} style={styles.allowedImg} />
+              ))}
+            </TouchableOpacity>
+          ) : (
+            <Text style={styles.textWhite}>Todas las apps en escucha</Text>
+          )}
+          <View style={styles.allowedImgContainer}>
+            <Button loading={syncing} label="Sync" onPress={onSync} />
+            <Button loading={syncing} label="Verify" onPress={verifyStatus} />
+          </View>
+        </View>
 
-            <View style={styles.divider} />
+        <View style={styles.divider} />
 
-            <View style={styles.permissionHeader}>
-              <Text style={styles.allowedListLabel} onPress={() => handleCounter('first')}>
-                Listener:
-              </Text>
-              <Text style={styles.allowedListLabel}>{listenerEnabled ? '🟢 Activo' : '🔴 Inactivo'}</Text>
-              {listenerEnabled ? null : (
-                <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.openListenerSettings()} />
-              )}
-            </View>
+        <View style={styles.permissionHeader}>
+          <Text style={styles.allowedListLabel}>Permiso para leer notificaciones:</Text>
+          <Text style={styles.allowedListLabel}>{listenerEnabled ? '🟢 Activo' : '🔴 Inactivo'}</Text>
+          {listenerEnabled ? null : (
+            <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.openListenerSettings()} />
+          )}
+        </View>
 
-            <View style={[styles.permissionHeader, { marginTop: 8 }]}>
-              <Text style={styles.allowedListLabel} onPress={() => handleCounter('second')}>
-                Sincronización:
-              </Text>
-              <Text style={styles.allowedListLabel}>{syncActive ? '🟢 Activo' : '🔴 Inactivo'}</Text>
-              {syncActive ? null : <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.triggerSync()} />}
-            </View>
-          </Fragment>
-        ) : (
-          <Fragment>
-            <Text style={styles.permissionTitle}>Permiso requerido</Text>
-            <Text style={styles.permissionText}>NapListener necesita acceso a las notificaciones para funcionar correctamente.</Text>
-
-            <Button size="large" label="Conceder permiso" onPress={() => NotificationModule.openNotificationSettings()} />
-          </Fragment>
-        )}
+        <View style={[styles.permissionHeader, { marginTop: 8 }]}>
+          <Text style={styles.allowedListLabel}>Sincronización:</Text>
+          <Text style={styles.allowedListLabel}>{syncActive ? '🟢 Activo' : '🔴 Inactivo'}</Text>
+          {syncActive ? null : <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.triggerSync()} />}
+        </View>
       </View>
 
-      {hasPermission ? (
-        <FlatList
-          style={styles.cardContainer}
-          data={notifications}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <View style={styles.header}>
-                <Text style={styles.title}>{item.title || '—'}</Text>
-                <Text style={styles.event}>{new Date(item.timestamp).toLocaleString()}</Text>
-              </View>
-              <Text style={styles.text}>{item.text || '—'}</Text>
-              <Text style={styles.app}>{item.packageName}</Text>
+      <FlatList
+        style={styles.cardContainer}
+        data={notifications}
+        keyExtractor={item => item.id.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <View style={styles.header}>
+              <Text style={styles.title}>{item.title || '—'}</Text>
+              <Text style={styles.event}>{new Date(item.timestamp).toLocaleString()}</Text>
             </View>
-          )}
-          ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Empty title="No hay notificaciones registradas" />
-            </View>
-          }
-          onEndReached={() => loadNotifications()}
-          onEndReachedThreshold={0.7}
-          refreshing={refreshing}
-          onRefresh={() => {
-            setRefreshing(true);
-            loadNotifications(true);
-          }}
-          ListFooterComponent={loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
-        />
-      ) : null}
+            <Text style={styles.text}>{item.text || '—'}</Text>
+            <Text style={styles.app}>{item.packageName}</Text>
+          </View>
+        )}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Empty title="No hay notificaciones registradas" />
+          </View>
+        }
+        onEndReached={() => loadNotifications()}
+        onEndReachedThreshold={0.7}
+        refreshing={refreshing}
+        onRefresh={() => {
+          setRefreshing(true);
+          loadNotifications(true);
+        }}
+        ListFooterComponent={loading ? <ActivityIndicator style={styles.indicatorSpacing} /> : null}
+      />
     </SafeAreaView>
   );
 };
@@ -314,5 +296,11 @@ const styles = StyleSheet.create({
   text: {
     color: '#cbd5f5',
     marginTop: 2,
+  },
+  textWhite: {
+    color: '#ffffff',
+  },
+  indicatorSpacing: {
+    margin: 16,
   },
 });

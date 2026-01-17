@@ -1,6 +1,6 @@
 {
-  "name": "NapListener",
-  "version": "0.0.1",
+  "name": "naplistener",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
