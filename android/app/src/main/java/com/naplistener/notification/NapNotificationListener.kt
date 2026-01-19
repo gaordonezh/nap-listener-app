@@ -1,6 +1,5 @@
 package com.naplistener.notification
 
-import android.content.ComponentName
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -15,14 +14,15 @@ class NapNotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
         super.onListenerConnected()
+        ListenerProbeState.connected = true
         Log.d("NapListener", "NotificationListener CONNECTED")
         NotificationEventEmitter.notifyStatus("CONNECTED")
     }
 
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
-        Log.e("NapListener", "NotificationListener DISCONNECTED")
-        requestRebind(ComponentName(this, NapNotificationListener::class.java))
+        ListenerProbeState.connected = false
+        Log.d("NapListener", "NotificationListener DISCONNECTED")
         NotificationEventEmitter.notifyStatus("DISCONNECTED")
     }
 

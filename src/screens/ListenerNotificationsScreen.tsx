@@ -89,11 +89,11 @@ const ListenerNotificationsScreen = () => {
 
   const initAllowedApps = async () => {
     // si esta vacío, escucha a todas las apps
-    handleSetPackages([]);
-    // const res: Array<string> = await NotificationModule.getAllowedPackages();
+    // handleSetPackages([]);
 
-    // if (res.length) await handleSetPackages(res);
-    // else await handleSetPackages([yapePackageName, whatsappPackageName]);
+    const res: Array<string> = await NotificationModule.getAllowedPackages();
+    if (res.length) await handleSetPackages(res);
+    else await handleSetPackages([yapePackageName, whatsappPackageName]);
   };
 
   const handleSetPackages = async (pkgs: Array<string>) => {
@@ -134,8 +134,8 @@ const ListenerNotificationsScreen = () => {
       Alert.alert('OK', 'Listener funcionando correctamente');
     } catch (error: any) {
       Alert.alert(
-        'Listener detenido',
-        'Se intentó reactivar automáticamente. Si el problema persiste, revisa permisos y batería. ' + String(error.message),
+        'Android detuvo el acceso a las notificaciones.',
+        'Es necesario volver a reactivar Nap Listener. Si el problema persiste, revisa permisos y batería.',
       );
     } finally {
       setSyncing(false);

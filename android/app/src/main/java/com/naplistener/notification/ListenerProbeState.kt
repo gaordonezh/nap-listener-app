@@ -1,7 +1,6 @@
 package com.naplistener.notification
 
 object ListenerProbeState {
-    @Volatile var lastProbeId: String? = null
-
+    @Volatile var connected: Boolean = false
     @Volatile var received: Boolean = false
 }

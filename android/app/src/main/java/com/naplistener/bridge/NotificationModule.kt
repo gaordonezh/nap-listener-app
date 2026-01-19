@@ -6,10 +6,13 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import com.facebook.react.bridge.*
+import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReactMethod
 import com.naplistener.BuildConfig
 import com.naplistener.db.AppDatabase
 import com.naplistener.notification.AllowedAppsStore
 import com.naplistener.notification.ListenerProbeState
+import com.naplistener.notification.NapListenerRebinder
 import com.naplistener.notification.NotificationListenerUtils
 import com.naplistener.probe.ProbeService
 import com.naplistener.user.UserStore
@@ -172,6 +175,17 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
     reactContext.startService(intent)
 
     Handler(Looper.getMainLooper())
-            .postDelayed({ promise.resolve(ListenerProbeState.received) }, 3000)
+            .postDelayed(
+                    {
+                      val alive = ListenerProbeState.received
+
+                      if (!alive) {
+                        NapListenerRebinder.rebind(reactContext)
+                      }
+
+                      promise.resolve(alive)
+                    },
+                    3000
+            )
   }
 }
