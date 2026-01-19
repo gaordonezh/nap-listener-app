@@ -60,16 +60,15 @@ const ListenerNotificationsScreen = () => {
   useEffect(() => {
     initAllowedApps();
     loadStatus();
+    requestNotificationPermission();
+  }, []);
 
+  useEffect(() => {
     const sub = emitter.addListener('listener_status', status => {
       setSyncActive(status === 'CONNECTED');
     });
 
     return () => sub.remove();
-  }, []);
-
-  useEffect(() => {
-    requestNotificationPermission();
   }, []);
 
   useEffect(() => {
@@ -89,9 +88,12 @@ const ListenerNotificationsScreen = () => {
   };
 
   const initAllowedApps = async () => {
-    // await handleSetPackages([]);
-    await handleSetPackages([yapePackageName]);
+    // si esta vacío, escucha a todas las apps
+    handleSetPackages([]);
     // const res: Array<string> = await NotificationModule.getAllowedPackages();
+
+    // if (res.length) await handleSetPackages(res);
+    // else await handleSetPackages([yapePackageName, whatsappPackageName]);
   };
 
   const handleSetPackages = async (pkgs: Array<string>) => {
@@ -179,7 +181,7 @@ const ListenerNotificationsScreen = () => {
       <FlatList
         style={styles.cardContainer}
         data={notifications}
-        keyExtractor={item => item.id.toString()}
+        keyExtractor={(_, index) => index.toString()}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.header}>

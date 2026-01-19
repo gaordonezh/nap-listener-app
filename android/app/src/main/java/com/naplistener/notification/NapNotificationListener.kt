@@ -28,9 +28,9 @@ class NapNotificationListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
 
-        val title = sbn.notification.extras.getString("android.title")
+        val titleInit = sbn.notification.extras.getString("android.title")
 
-        if (title == "Nap Listener Health") {
+        if (titleInit == "Nap Listener Health") {
             ListenerProbeState.received = true
             return
         }
@@ -64,6 +64,7 @@ class NapNotificationListener : NotificationListenerService() {
                 try {
                     NotificationRepository.save(applicationContext, entity)
                     NotificationEventEmitter.notifyChanged()
+                    NotificationRepository.sendImmediately(applicationContext)
                 } catch (e: Exception) {
                     Log.e("NapListener", "Error onNotificationPosted Interno", e)
                     e.printStackTrace()

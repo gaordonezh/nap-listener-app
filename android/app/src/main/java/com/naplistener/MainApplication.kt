@@ -36,7 +36,7 @@ class MainApplication : Application(), ReactApplication {
 
   private fun scheduleCleanupWorker(context: Context) {
     val workRequest =
-            PeriodicWorkRequestBuilder<NotificationCleanupWorker>(30, TimeUnit.MINUTES).build()
+            PeriodicWorkRequestBuilder<NotificationCleanupWorker>(1, TimeUnit.HOURS).build()
 
     WorkManager.getInstance(context)
             .enqueueUniquePeriodicWork(
