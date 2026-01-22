@@ -15,15 +15,14 @@ class NapNotificationListener : NotificationListenerService() {
     override fun onListenerConnected() {
         super.onListenerConnected()
         ListenerProbeState.connected = true
-        Log.d("NapListener", "NotificationListener CONNECTED")
         NotificationEventEmitter.notifyStatus("CONNECTED")
     }
 
     override fun onListenerDisconnected() {
         super.onListenerDisconnected()
         ListenerProbeState.connected = false
-        Log.d("NapListener", "NotificationListener DISCONNECTED")
         NotificationEventEmitter.notifyStatus("DISCONNECTED")
+        NapListenerRebinder.rebind(this)
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {

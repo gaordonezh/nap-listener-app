@@ -1,7 +1,9 @@
 package com.naplistener.bridge
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
@@ -14,7 +16,8 @@ import com.naplistener.notification.AllowedAppsStore
 import com.naplistener.notification.ListenerProbeState
 import com.naplistener.notification.NapListenerRebinder
 import com.naplistener.notification.NotificationListenerUtils
-import com.naplistener.probe.ProbeService
+import com.naplistener.service.NapForegroundService
+import com.naplistener.service.ProbeService
 import com.naplistener.user.UserStore
 import com.naplistener.worker.NotificationSyncWorker
 import com.naplistener.worker.WorkStatusUtils
@@ -187,5 +190,22 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
                     },
                     3000
             )
+  }
+
+  @ReactMethod
+  fun startForegroundService() {
+    val intent = Intent(reactContext, NapForegroundService::class.java)
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      reactContext.startForegroundService(intent)
+    } else {
+      reactContext.startService(intent)
+    }
+  }
+
+  @ReactMethod
+  fun stopForegroundService() {
+    val intent = Intent(reactContext, NapForegroundService::class.java)
+    reactContext.stopService(intent)
   }
 }

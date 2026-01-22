@@ -61,6 +61,7 @@ const ListenerNotificationsScreen = () => {
     initAllowedApps();
     loadStatus();
     requestNotificationPermission();
+    NotificationModule.startForegroundService();
   }, []);
 
   useEffect(() => {
@@ -93,7 +94,7 @@ const ListenerNotificationsScreen = () => {
 
     const res: Array<string> = await NotificationModule.getAllowedPackages();
     if (res.length) await handleSetPackages(res);
-    else await handleSetPackages([yapePackageName, whatsappPackageName]);
+    else await handleSetPackages([yapePackageName]);
   };
 
   const handleSetPackages = async (pkgs: Array<string>) => {
@@ -153,11 +154,12 @@ const ListenerNotificationsScreen = () => {
               ))}
             </TouchableOpacity>
           ) : (
-            <Text style={styles.textWhite}>Todas las apps en escucha</Text>
+            <Text style={styles.textWhite}>All Apps</Text>
           )}
           <View style={styles.allowedImgContainer}>
             <Button loading={syncing} label="Sync" onPress={onSync} />
-            <Button loading={syncing} label="Verify" onPress={verifyStatus} />
+            <Button loading={syncing} label="Check" onPress={verifyStatus} />
+            <Button loading={syncing} label="B" onPress={() => NotificationModule.startForegroundService()} />
           </View>
         </View>
 
