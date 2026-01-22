@@ -61,9 +61,8 @@ class NapNotificationListener : NotificationListenerService() {
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    NotificationRepository.save(applicationContext, entity)
+                    NotificationRepository.saveAndSend(applicationContext, entity)
                     NotificationEventEmitter.notifyChanged()
-                    NotificationRepository.sendImmediately(applicationContext)
                 } catch (e: Exception) {
                     Log.e("NapListener", "Error onNotificationPosted Interno", e)
                     e.printStackTrace()
