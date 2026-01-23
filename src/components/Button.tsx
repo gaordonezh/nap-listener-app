@@ -63,11 +63,7 @@ const Button = ({ style, label, color = 'main', variant = 'filled', size = 'norm
 
   return (
     <TouchableOpacity style={[variantClasses.container, style]} disabled={rest.disabled || loading} {...rest}>
-      {loading ? (
-        <ActivityIndicator size={currentSize.height - 15} style={styles.indicator} />
-      ) : (
-        <Text style={[variantClasses.text, styles.buttonText]}>{label}</Text>
-      )}
+      {loading ? <ActivityIndicator size={currentSize.height - 15} /> : <Text style={[variantClasses.text, styles.buttonText]}>{label}</Text>}
     </TouchableOpacity>
   );
 };
@@ -86,8 +82,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
     fontWeight: '600',
-  },
-  indicator: {
-    paddingHorizontal: 20,
   },
 });

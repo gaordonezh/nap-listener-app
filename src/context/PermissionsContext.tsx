@@ -6,6 +6,7 @@ interface PermissionsContextProps {
   hasNotificacionPermission: boolean;
   hasAllowedReadNotifications: boolean;
   requestNotificationPermission: () => Promise<void>;
+  openNotificationListenerSettings: (show: boolean) => void;
 }
 
 const PermissionsContext = createContext({} as PermissionsContextProps);
@@ -60,9 +61,27 @@ const PermissionsContextProvider = ({ children }: PropsWithChildren) => {
     setNotificacionPermission(hasPermission);
   };
 
+  const openNotificationListenerSettings = (showAlert: boolean) => {
+    if (showAlert) {
+      Alert.alert(
+        'Android detuvo el acceso a las notificaciones de Yape',
+        `Para que la app siga registrando notificaciones, debes seguir los siguientes pasos:\n
+— Desactivar Nap Listener\n— Esperar 3 - 5 segundos\n— Activarlo de nuevo\n— Confirmar diálogo del sistema\n— Confirmar diálogo del sistema\n— Cerrar y volver a abrir Nap Listener.\n
+Después de esto, la app continuará registrando las notificaciones de Yape.`,
+        [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Ir a configuración', onPress: () => NativeModules.NotificationModule.openNotificationSettings() },
+        ],
+      );
+    } else {
+      NativeModules.NotificationModule.openNotificationSettings();
+    }
+  };
+
   const values = useMemo(
     () => ({
       requestNotificationPermission,
+      openNotificationListenerSettings,
       hasNotificacionPermission: notificacionPermission,
       hasAllowedReadNotifications: allowedReadNotifications,
     }),

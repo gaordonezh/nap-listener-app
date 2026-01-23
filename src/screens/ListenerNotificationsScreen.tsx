@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, Fragment } from 'react';
 import { View, Text, FlatList, ActivityIndicator, NativeModules, NativeEventEmitter, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { appsImage, whatsappPackageName, yapePackageName } from '../utils/constants';
@@ -23,7 +23,7 @@ type NotificationItem = {
 const counter = { value: 0 };
 
 const ListenerNotificationsScreen = () => {
-  const { requestNotificationPermission } = usePermissionsContext();
+  const { requestNotificationPermission, openNotificationListenerSettings } = usePermissionsContext();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -81,11 +81,16 @@ const ListenerNotificationsScreen = () => {
   }, []);
 
   const loadStatus = async () => {
-    const listener = await NotificationModule.isListenerEnabled();
-    const sync = await NotificationModule.isSyncActive();
-
-    setSyncActive(sync);
-    setListenerEnabled(listener);
+    try {
+      setSyncing(true);
+      const [sync, listener] = await Promise.all([NotificationModule.isSyncActive(), NotificationModule.verifyListener()]);
+      setListenerEnabled(listener);
+      setSyncActive(sync);
+    } catch (error) {
+      Alert.alert('Error', 'No se pudo verificar los permisos');
+    } finally {
+      setSyncing(false);
+    }
   };
 
   const initAllowedApps = async () => {
@@ -93,20 +98,19 @@ const ListenerNotificationsScreen = () => {
     // handleSetPackages([]);
 
     const res: Array<string> = await NotificationModule.getAllowedPackages();
-    if (res.length) await handleSetPackages(res);
-    else await handleSetPackages([yapePackageName]);
+    if (res.length) handleSetPackages(res);
+    else handleSetPackages([yapePackageName]);
   };
 
-  const handleSetPackages = async (pkgs: Array<string>) => {
+  const handleSetPackages = (pkgs: Array<string>) => {
     setAllowed(pkgs);
-    await NotificationModule.setAllowedPackages(pkgs);
+    NotificationModule.setAllowedPackages(pkgs);
   };
 
   const onSync = async () => {
     try {
       setSyncing(true);
-      await NotificationModule.syncNow();
-      await sleep(1000);
+      await Promise.all([NotificationModule.syncNow(), sleep(1000)]);
       Alert.alert('Sincronización', 'Envío iniciado');
     } catch {
       Alert.alert('Error', 'No se pudo sincronizar');
@@ -125,24 +129,6 @@ const ListenerNotificationsScreen = () => {
     }
   };
 
-  const verifyStatus = async () => {
-    try {
-      setSyncing(true);
-
-      const ok = await NotificationModule.verifyListener();
-      if (!ok) throw new Error('NOT FOUND');
-
-      Alert.alert('OK', 'Listener funcionando correctamente');
-    } catch (error: any) {
-      Alert.alert(
-        'Android detuvo el acceso a las notificaciones.',
-        'Es necesario volver a reactivar Nap Listener. Si el problema persiste, revisa permisos y batería.',
-      );
-    } finally {
-      setSyncing(false);
-    }
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.permissionBox}>
@@ -158,25 +144,35 @@ const ListenerNotificationsScreen = () => {
           )}
           <View style={styles.allowedImgContainer}>
             <Button loading={syncing} label="Sync" onPress={onSync} />
-            <Button loading={syncing} label="Check" onPress={verifyStatus} />
-            <Button loading={syncing} label="B" onPress={() => NotificationModule.startForegroundService()} />
           </View>
         </View>
 
         <View style={styles.divider} />
 
         <View style={styles.permissionHeader}>
-          <Text style={styles.allowedListLabel}>Permiso para leer notificaciones:</Text>
-          <Text style={styles.allowedListLabel}>{listenerEnabled ? '🟢 Activo' : '🔴 Inactivo'}</Text>
-          {listenerEnabled ? null : (
-            <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.openListenerSettings()} />
+          <View>
+            {listenerEnabled ? (
+              <Text style={styles.allowedListLabel}>Escucha de notificaciones:</Text>
+            ) : (
+              <Fragment>
+                <Text style={styles.allowedListLabel}>⚠️ Nap Listener Pausado ⚠️</Text>
+                <Text style={styles.allowedListLabelWarning}>Android detuvo el acceso a notificaciones</Text>
+              </Fragment>
+            )}
+          </View>
+
+          {listenerEnabled ? (
+            <Text style={styles.allowedListLabel}>🟢 Activo</Text>
+          ) : (
+            <Button size="small" variant="transparent" label="Activar" onPress={() => openNotificationListenerSettings(true)} />
           )}
         </View>
 
-        <View style={[styles.permissionHeader, { marginTop: 8 }]}>
+        {listenerEnabled ? null : <View style={styles.divider} />}
+
+        <View style={[styles.permissionHeader]}>
           <Text style={styles.allowedListLabel}>Sincronización:</Text>
           <Text style={styles.allowedListLabel}>{syncActive ? '🟢 Activo' : '🔴 Inactivo'}</Text>
-          {syncActive ? null : <Button size="small" variant="transparent" label="Activar" onPress={() => NotificationModule.triggerSync()} />}
         </View>
       </View>
 
@@ -258,8 +254,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   allowedListLabel: {
-    fontSize: 14,
+    fontSize: 16,
     color: '#ffffff',
+  },
+  allowedListLabelWarning: {
+    fontSize: 12,
+    color: '#fff200',
   },
   permissionText: {
     color: '#cbd5f5',

@@ -1,7 +1,6 @@
 package com.naplistener.bridge
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Handler
@@ -15,7 +14,6 @@ import com.naplistener.db.AppDatabase
 import com.naplistener.notification.AllowedAppsStore
 import com.naplistener.notification.ListenerProbeState
 import com.naplistener.notification.NapListenerRebinder
-import com.naplistener.notification.NotificationListenerUtils
 import com.naplistener.service.NapForegroundService
 import com.naplistener.service.ProbeService
 import com.naplistener.user.UserStore
@@ -33,7 +31,7 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun openNotificationSettings() {
-    val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
+    val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     reactContext.startActivity(intent)
   }
@@ -110,38 +108,14 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun triggerSync(promise: Promise) {
+  fun syncNow(promise: Promise) {
     try {
+      NotificationSyncWorker.enqueueManual(reactContext)
       NotificationSyncWorker.enqueue(reactContext)
       promise.resolve(true)
     } catch (e: Exception) {
       promise.reject("SYNC_ERROR", e)
     }
-  }
-
-  @ReactMethod
-  fun syncNow(promise: Promise) {
-    NotificationSyncWorker.enqueueManual(reactContext)
-    promise.resolve(true)
-  }
-
-  @ReactMethod
-  fun isListenerEnabled(promise: Promise) {
-    try {
-      val enabled = NotificationListenerUtils.isEnabled(reactContext)
-      promise.resolve(enabled)
-    } catch (e: Exception) {
-      promise.reject("LISTENER_STATUS_ERROR", e)
-    }
-  }
-
-  @ReactMethod
-  fun openListenerSettings() {
-    val intent =
-            Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-
-    reactContext.startActivity(intent)
   }
 
   @ReactMethod

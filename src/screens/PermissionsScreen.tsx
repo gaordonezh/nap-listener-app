@@ -1,11 +1,12 @@
 import React, { Fragment } from 'react';
-import { NativeModules, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../components/Button';
 import { usePermissionsContext } from '../context/PermissionsContext';
 
 const PermissionsScreen = () => {
-  const { hasAllowedReadNotifications, hasNotificacionPermission, requestNotificationPermission } = usePermissionsContext();
+  const { hasAllowedReadNotifications, hasNotificacionPermission, requestNotificationPermission, openNotificationListenerSettings } =
+    usePermissionsContext();
   const { height } = useWindowDimensions();
 
   return (
@@ -29,7 +30,7 @@ const PermissionsScreen = () => {
               <Text style={[styles.subtitle, styles.textWhite]}>
                 Además, necesitamos permiso para leer las notificaciones de Yape para continuar...
               </Text>
-              <Button size="large" label="Conceder permiso" onPress={() => NativeModules.NotificationModule.openNotificationSettings()} />
+              <Button size="large" label="Conceder permiso" onPress={() => openNotificationListenerSettings(false)} />
             </Fragment>
           ) : null}
         </View>
