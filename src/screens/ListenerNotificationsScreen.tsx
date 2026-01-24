@@ -29,8 +29,8 @@ const ListenerNotificationsScreen = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [allowed, setAllowed] = useState<Array<string>>([]);
-  const [listenerEnabled, setListenerEnabled] = useState<boolean>(false);
-  const [syncActive, setSyncActive] = useState<boolean>(false);
+  const [listenerEnabled, setListenerEnabled] = useState<boolean>(true);
+  const [syncActive, setSyncActive] = useState<boolean>(true);
   const [syncing, setSyncing] = useState(false);
 
   const loadNotifications = useCallback(
