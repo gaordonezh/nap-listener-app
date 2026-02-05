@@ -40,7 +40,7 @@ const Button = ({ style, label, color = 'main', variant = 'filled', size = 'norm
     },
     outlined: {
       container: {
-        backgroundColor: '#ffffff',
+        backgroundColor: 'transparent',
         borderWidth: 2,
         borderColor: currentColor,
         ...currentSize,

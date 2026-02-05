@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.naplistener.R
 
 class NapForegroundService : Service() {
 
@@ -28,8 +29,8 @@ class NapForegroundService : Service() {
 
     val notification =
             NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setSmallIcon(android.R.drawable.stat_notify_more)
-                    .setContentTitle("Nap Listener activo")
+                    .setSmallIcon(R.drawable.ic_notification)
+                    .setContentTitle("Nap Listener")
                     .setContentText("Escuchando notificaciones en segundo plano")
                     .setOngoing(true)
                     .setCategory(NotificationCompat.CATEGORY_SERVICE)

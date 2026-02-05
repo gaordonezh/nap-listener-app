@@ -32,6 +32,7 @@ const ListenerNotificationsScreen = () => {
   const [listenerEnabled, setListenerEnabled] = useState<boolean>(true);
   const [syncActive, setSyncActive] = useState<boolean>(true);
   const [syncing, setSyncing] = useState(false);
+  const [listenerLoading, setListenerLoading] = useState(false);
 
   const loadNotifications = useCallback(
     async (reset?: boolean) => {
@@ -82,14 +83,14 @@ const ListenerNotificationsScreen = () => {
 
   const loadStatus = async () => {
     try {
-      setSyncing(true);
+      setListenerLoading(true);
       const [sync, listener] = await Promise.all([NotificationModule.isSyncActive(), NotificationModule.verifyListener()]);
       setListenerEnabled(listener);
       setSyncActive(sync);
     } catch (error) {
       Alert.alert('Error', 'No se pudo verificar los permisos');
     } finally {
-      setSyncing(false);
+      setListenerLoading(false);
     }
   };
 
@@ -127,11 +128,22 @@ const ListenerNotificationsScreen = () => {
     if (counter.value === 25) {
       handleSetPackages([yapePackageName]);
     }
+    if (counter.value === 30) {
+      handleSetPackages([]);
+    }
   };
+
+  const getLabelStatus = (status: boolean) => {
+    if (listenerLoading) return '🟡 Pendiente';
+    if (status) return '🟢 Activo';
+    return '🔴 Inactivo';
+  };
+
+  const hasWarning = !listenerEnabled || !syncActive;
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.permissionBox}>
+      <View style={[styles.permissionBox, hasWarning ? styles.permissionBoxWarning : {}]}>
         <View style={styles.permissionHeader}>
           {Array.from(allowed).length ? (
             <TouchableOpacity style={styles.allowedImgContainer} onPress={handleCounter} activeOpacity={1}>
@@ -143,28 +155,32 @@ const ListenerNotificationsScreen = () => {
             <Text style={styles.textWhite}>All Apps</Text>
           )}
           <View style={styles.allowedImgContainer}>
-            <Button loading={syncing} label="Sync" onPress={onSync} />
+            <Button loading={syncing || listenerLoading} label="Sync" onPress={onSync} />
           </View>
         </View>
 
         <View style={styles.divider} />
 
         <View style={styles.permissionHeader}>
-          <View>
+          <View style={styles.flex1}>
             {listenerEnabled ? (
               <Text style={styles.allowedListLabel}>Escucha de notificaciones:</Text>
             ) : (
               <Fragment>
-                <Text style={styles.allowedListLabel}>⚠️ Nap Listener Pausado ⚠️</Text>
+                <Text style={styles.allowedListLabel}>⚠️ Nap Listener dejó de tener acceso a las notificaciones ⚠️</Text>
                 <Text style={styles.allowedListLabelWarning}>Android detuvo el acceso a notificaciones</Text>
+                <Text style={[styles.allowedListLabelInfo, { marginTop: 8 }]}>Recomendaciones:</Text>
+                <Text style={styles.allowedListLabelInfo}>— Excluir la app de optimización de batería</Text>
+                <Text style={styles.allowedListLabelInfo}>— Permitir ejecución en segundo plano</Text>
+                <Text style={styles.allowedListLabelInfo}>— No "limpiar apps" manualmente</Text>
               </Fragment>
             )}
           </View>
 
           {listenerEnabled ? (
-            <Text style={styles.allowedListLabel}>🟢 Activo</Text>
+            <Text style={styles.allowedListLabel}>{getLabelStatus(listenerEnabled)}</Text>
           ) : (
-            <Button size="small" variant="transparent" label="Activar" onPress={() => openNotificationListenerSettings(true)} />
+            <Button size="small" variant="outlined" label="Activar" color="warning" onPress={() => openNotificationListenerSettings(true)} />
           )}
         </View>
 
@@ -172,7 +188,7 @@ const ListenerNotificationsScreen = () => {
 
         <View style={[styles.permissionHeader]}>
           <Text style={styles.allowedListLabel}>Sincronización:</Text>
-          <Text style={styles.allowedListLabel}>{syncActive ? '🟢 Activo' : '🔴 Inactivo'}</Text>
+          <Text style={styles.allowedListLabel}>{getLabelStatus(syncActive)}</Text>
         </View>
       </View>
 
@@ -211,6 +227,9 @@ const ListenerNotificationsScreen = () => {
 export default ListenerNotificationsScreen;
 
 const styles = StyleSheet.create({
+  flex1: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     backgroundColor: '#0f172a',
@@ -231,6 +250,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#020617',
     borderWidth: 1,
     borderColor: '#1e293b',
+  },
+  permissionBoxWarning: {
+    backgroundColor: '#D9770625',
+    borderColor: '#D9770675',
   },
   permissionHeader: {
     display: 'flex',
@@ -260,6 +283,10 @@ const styles = StyleSheet.create({
   allowedListLabelWarning: {
     fontSize: 12,
     color: '#fff200',
+  },
+  allowedListLabelInfo: {
+    fontSize: 12,
+    color: '#6e7fb1',
   },
   permissionText: {
     color: '#cbd5f5',

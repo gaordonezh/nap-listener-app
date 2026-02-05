@@ -8,6 +8,7 @@ import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import kotlin.random.Random
+import com.naplistener.R
 
 class ProbeService : Service() {
 
@@ -24,7 +25,7 @@ class ProbeService : Service() {
 
     val notification: Notification =
             NotificationCompat.Builder(this, channelId)
-                    .setSmallIcon(android.R.drawable.stat_notify_more)
+                    .setSmallIcon(R.drawable.ic_notification)
                     .setContentTitle(serviceName)
                     .setContentText("Verificación de escucha de notificaciones de Nap Listener")
                     .build()
