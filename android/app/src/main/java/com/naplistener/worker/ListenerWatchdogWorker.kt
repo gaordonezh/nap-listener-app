@@ -3,7 +3,6 @@ package com.naplistener.worker
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.naplistener.notification.ListenerProbeState
@@ -15,7 +14,6 @@ class ListenerWatchdogWorker(context: Context, params: WorkerParameters) :
     override suspend fun doWork(): Result {
 
         if (!ListenerProbeState.connected) {
-            Log.w("NapListener", "Watchdog detectó listener caído")
 
             val intent = Intent(applicationContext, NapForegroundService::class.java)
 

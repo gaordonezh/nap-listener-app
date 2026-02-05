@@ -7,7 +7,6 @@ import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.naplistener.R
 
@@ -18,14 +17,11 @@ class NapForegroundService : Service() {
 
   override fun onCreate() {
     super.onCreate()
-    Log.d("NapFGS", "🔥 NapForegroundService onCreate")
 
     createNotificationChannel()
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
-    Log.d("NapFGS", "onStartCommand")
 
     val notification =
             NotificationCompat.Builder(this, CHANNEL_ID)
@@ -70,7 +66,7 @@ class NapForegroundService : Service() {
   override fun onBind(intent: Intent?): IBinder? = null
 
   override fun onDestroy() {
-    Log.d("NapFGS", "🛑 NapForegroundService destroyed")
+
     super.onDestroy()
     stopForeground(true)
   }
