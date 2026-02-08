@@ -26,7 +26,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#ffffff',
     paddingHorizontal: 20,
-    paddingVertical: 40,
+    paddingVertical: 60,
   },
   main_loader_title: {
     fontSize: 32,
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     color: MAIN_COLOR,
   },
   main_loader_first_paragraph: {
-    color: MAIN_COLOR,
+    color: '#FFFfff',
     fontWeight: '500',
     textAlign: 'center',
     fontSize: 22,

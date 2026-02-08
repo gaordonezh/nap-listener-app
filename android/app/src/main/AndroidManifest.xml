@@ -2,10 +2,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-
 
     <application
         android:name=".MainApplication"
@@ -32,7 +28,7 @@
         <service
             android:name=".notification.NapNotificationListener"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
-            android:exported="true">
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />
             </intent-filter>
@@ -41,24 +37,5 @@
         <service
             android:name=".service.ProbeService"
             android:exported="false" />
-
-        <service
-            android:name=".service.NapForegroundService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <meta-data
-                android:name="android.app.foregroundServiceType.specialUse"
-                android:value="Mantener activo el NotificationListenerService para registrar notificaciones en segundo plano incluso si el sistema intenta detener la app." />
-        </service>
-
-        <receiver
-            android:name=".receiver.BootReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
     </application>
 </manifest>

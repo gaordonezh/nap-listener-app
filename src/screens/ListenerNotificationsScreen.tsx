@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, Fragment } from 'react';
 import { View, Text, FlatList, ActivityIndicator, NativeModules, NativeEventEmitter, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { appsImage, whatsappPackageName, yapePackageName } from '../utils/constants';
+import { appsImage, yapePackageName } from '../utils/constants';
 import Button from '../components/Button';
 import { sleep } from '../utils/functions';
 import Empty from '../components/Empty';
@@ -62,7 +62,6 @@ const ListenerNotificationsScreen = () => {
     initAllowedApps();
     loadStatus();
     requestNotificationPermission();
-    NotificationModule.startForegroundService();
   }, []);
 
   useEffect(() => {
@@ -95,9 +94,6 @@ const ListenerNotificationsScreen = () => {
   };
 
   const initAllowedApps = async () => {
-    // si esta vacío, escucha a todas las apps
-    // handleSetPackages([]);
-
     const res: Array<string> = await NotificationModule.getAllowedPackages();
     if (res.length) handleSetPackages(res);
     else handleSetPackages([yapePackageName]);
@@ -120,19 +116,6 @@ const ListenerNotificationsScreen = () => {
     }
   };
 
-  const handleCounter = () => {
-    counter.value++;
-    if (counter.value === 20) {
-      handleSetPackages([yapePackageName, whatsappPackageName]);
-    }
-    if (counter.value === 25) {
-      handleSetPackages([yapePackageName]);
-    }
-    if (counter.value === 30) {
-      handleSetPackages([]);
-    }
-  };
-
   const getLabelStatus = (status: boolean) => {
     if (listenerLoading) return '🟡 Pendiente';
     if (status) return '🟢 Activo';
@@ -146,7 +129,7 @@ const ListenerNotificationsScreen = () => {
       <View style={[styles.permissionBox, hasWarning ? styles.permissionBoxWarning : {}]}>
         <View style={styles.permissionHeader}>
           {Array.from(allowed).length ? (
-            <TouchableOpacity style={styles.allowedImgContainer} onPress={handleCounter} activeOpacity={1}>
+            <TouchableOpacity style={styles.allowedImgContainer} activeOpacity={1}>
               {Array.from(allowed).map(item => (
                 <Image key={item} src={appsImage[item as keyof typeof appsImage]} style={styles.allowedImg} />
               ))}

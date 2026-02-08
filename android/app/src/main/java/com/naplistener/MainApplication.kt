@@ -12,7 +12,6 @@ import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.naplistener.bridge.NotificationPackage
-import com.naplistener.worker.ListenerWatchdogWorker
 import com.naplistener.worker.NotificationCleanupWorker
 import com.naplistener.worker.NotificationSyncWorker
 import java.util.concurrent.TimeUnit
@@ -33,7 +32,6 @@ class MainApplication : Application(), ReactApplication {
     scheduleCleanupWorker(this)
     scheduleSyncWorker(this)
     NotificationSyncWorker.enqueue(this)
-    startListenerWatchdog(this)
   }
 
   private fun scheduleCleanupWorker(context: Context) {
@@ -63,18 +61,6 @@ class MainApplication : Application(), ReactApplication {
                     "nap_notification_sync",
                     ExistingPeriodicWorkPolicy.KEEP,
                     request
-            )
-  }
-
-  private fun startListenerWatchdog(context: Context) {
-
-    val work = PeriodicWorkRequestBuilder<ListenerWatchdogWorker>(15, TimeUnit.MINUTES).build()
-
-    WorkManager.getInstance(context)
-            .enqueueUniquePeriodicWork(
-                    "nap_listener_watchdog",
-                    ExistingPeriodicWorkPolicy.KEEP,
-                    work
             )
   }
 }
