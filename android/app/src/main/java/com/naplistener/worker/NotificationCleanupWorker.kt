@@ -1,10 +1,10 @@
-package com.naplistener.worker
+package com.netappperu.naplistener.worker
 
 import android.content.Context
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.naplistener.db.AppDatabase
+import com.netappperu.naplistener.db.AppDatabase
 
 class NotificationCleanupWorker(context: Context, params: WorkerParameters) :
         Worker(context, params) {

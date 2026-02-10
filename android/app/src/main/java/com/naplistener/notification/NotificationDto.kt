@@ -1,6 +1,6 @@
-package com.naplistener.notification
+package com.netappperu.naplistener.notification
 
-import com.naplistener.db.NotificationEntity
+import com.netappperu.naplistener.db.NotificationEntity
 
 data class NotificationDto(
         val packageName: String,

@@ -1,4 +1,4 @@
-package com.naplistener
+package com.netappperu.naplistener
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

@@ -1,11 +1,11 @@
-package com.naplistener.notification
+package com.netappperu.naplistener.notification
 
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
-import com.naplistener.bridge.NotificationEventEmitter
-import com.naplistener.db.NotificationEntity
-import com.naplistener.user.UserStore
+import com.netappperu.naplistener.bridge.NotificationEventEmitter
+import com.netappperu.naplistener.db.NotificationEntity
+import com.netappperu.naplistener.user.UserStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

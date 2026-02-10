@@ -1,4 +1,4 @@
-package com.naplistener.db
+package com.netappperu.naplistener.db
 
 import android.content.Context
 import androidx.room.Database

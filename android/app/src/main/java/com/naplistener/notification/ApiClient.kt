@@ -1,6 +1,6 @@
-package com.naplistener.notification
+package com.netappperu.naplistener.notification
 
-import com.naplistener.BuildConfig
+import com.netappperu.naplistener.BuildConfig
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body

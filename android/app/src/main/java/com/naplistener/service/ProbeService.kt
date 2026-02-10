@@ -1,4 +1,4 @@
-package com.naplistener.service
+package com.netappperu.naplistener.service
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import kotlin.random.Random
-import com.naplistener.R
+import com.netappperu.naplistener.R
 
 class ProbeService : Service() {
 

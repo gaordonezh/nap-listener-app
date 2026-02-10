@@ -1,4 +1,4 @@
-package com.naplistener.bridge
+package com.netappperu.naplistener.bridge
 
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.modules.core.DeviceEventManagerModule

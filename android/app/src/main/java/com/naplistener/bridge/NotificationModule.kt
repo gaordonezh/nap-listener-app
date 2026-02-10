@@ -1,4 +1,4 @@
-package com.naplistener.bridge
+package com.netappperu.naplistener.bridge
 
 import android.content.ComponentName
 import android.content.Intent
@@ -8,15 +8,15 @@ import android.provider.Settings
 import com.facebook.react.bridge.*
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactMethod
-import com.naplistener.BuildConfig
-import com.naplistener.db.AppDatabase
-import com.naplistener.notification.AllowedAppsStore
-import com.naplistener.notification.ListenerProbeState
-import com.naplistener.notification.NapListenerRebinder
-import com.naplistener.service.ProbeService
-import com.naplistener.user.UserStore
-import com.naplistener.worker.NotificationSyncWorker
-import com.naplistener.worker.WorkStatusUtils
+import com.netappperu.naplistener.BuildConfig
+import com.netappperu.naplistener.db.AppDatabase
+import com.netappperu.naplistener.notification.AllowedAppsStore
+import com.netappperu.naplistener.notification.ListenerProbeState
+import com.netappperu.naplistener.notification.NapListenerRebinder
+import com.netappperu.naplistener.service.ProbeService
+import com.netappperu.naplistener.user.UserStore
+import com.netappperu.naplistener.worker.NotificationSyncWorker
+import com.netappperu.naplistener.worker.WorkStatusUtils
 
 class NotificationModule(private val reactContext: ReactApplicationContext) :
         ReactContextBaseJavaModule(reactContext) {
@@ -69,7 +69,7 @@ class NotificationModule(private val reactContext: ReactApplicationContext) :
               )
 
       val myComponent =
-              ComponentName(reactContext, "com.naplistener.notification.NapNotificationListener")
+              ComponentName(reactContext, "com.netappperu.naplistener.notification.NapNotificationListener")
 
       val granted = enabledListeners?.contains(myComponent.flattenToString()) ?: false
 

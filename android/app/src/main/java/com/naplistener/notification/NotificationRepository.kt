@@ -1,8 +1,8 @@
-package com.naplistener.notification
+package com.netappperu.naplistener.notification
 
 import android.content.Context
-import com.naplistener.db.AppDatabase
-import com.naplistener.db.NotificationEntity
+import com.netappperu.naplistener.db.AppDatabase
+import com.netappperu.naplistener.db.NotificationEntity
 
 object NotificationRepository {
 

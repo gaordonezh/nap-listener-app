@@ -1,4 +1,4 @@
-package com.naplistener.db
+package com.netappperu.naplistener.db
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

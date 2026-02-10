@@ -78,12 +78,12 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.naplistener"
+    namespace "com.netappperu.naplistener"
     defaultConfig {
-        applicationId "com.naplistener"
+        applicationId "com.netappperu.naplistener"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode 10
         versionName "1.0.0"
 
         buildConfigField(

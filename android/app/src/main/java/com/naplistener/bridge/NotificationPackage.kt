@@ -1,4 +1,4 @@
-package com.naplistener.bridge
+package com.netappperu.naplistener.bridge
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule

@@ -1,4 +1,4 @@
-package com.naplistener.worker
+package com.netappperu.naplistener.worker
 
 import android.content.Context
 import androidx.work.CoroutineWorker
@@ -7,9 +7,9 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.naplistener.db.AppDatabase
-import com.naplistener.notification.ApiClient
-import com.naplistener.notification.toDto
+import com.netappperu.naplistener.db.AppDatabase
+import com.netappperu.naplistener.notification.ApiClient
+import com.netappperu.naplistener.notification.toDto
 import java.util.concurrent.TimeUnit
 
 class NotificationSyncWorker(context: Context, params: WorkerParameters) :

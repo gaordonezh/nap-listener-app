@@ -1,4 +1,4 @@
-package com.naplistener
+package com.netappperu.naplistener
 
 import android.app.Application
 import android.content.Context
@@ -11,9 +11,9 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
-import com.naplistener.bridge.NotificationPackage
-import com.naplistener.worker.NotificationCleanupWorker
-import com.naplistener.worker.NotificationSyncWorker
+import com.netappperu.naplistener.bridge.NotificationPackage
+import com.netappperu.naplistener.worker.NotificationCleanupWorker
+import com.netappperu.naplistener.worker.NotificationSyncWorker
 import java.util.concurrent.TimeUnit
 
 class MainApplication : Application(), ReactApplication {
