@@ -4,7 +4,7 @@ import ValidateClientScreen from '../screens/ValidateClientScreen';
 import { ClientProps } from '../types/global';
 import ListenerNotificationsScreen from '../screens/ListenerNotificationsScreen';
 import { Alert, NativeModules } from 'react-native';
-import { handleGetClientData } from '../services/requests';
+import { handleValidateClient } from '../services/requests';
 import { phoneNumberUtils } from '../utils/functions';
 
 interface AppContextProps {
@@ -32,12 +32,11 @@ const AppContextProvider = () => {
       const isValid = phoneNumberUtils.valid(phoneSaved || '');
       if (!isValid) throw new Error('NOT FOUND 1');
 
-      const client = await handleGetClientData(phoneSaved);
+      const client = await handleValidateClient(phoneSaved);
       if (!client) throw new Error('NOT FOUND 2');
 
       setCurrentClient(client);
     } catch (error) {
-      console.log(error);
       await NativeModules.NotificationModule.saveUserName('-');
     } finally {
       setLoading(false);
@@ -46,6 +45,11 @@ const AppContextProvider = () => {
 
   const handleSetClient = async (client: ClientProps) => {
     try {
+      if (!client.clientId) {
+        setCurrentClient(client);
+        return;
+      }
+
       setLoading(true);
       await NativeModules.NotificationModule.saveUserName(client.phone);
       setCurrentClient(client);
@@ -60,7 +64,7 @@ const AppContextProvider = () => {
 
   return (
     <AppContext.Provider value={values}>
-      {loading ? <LoaderScreen /> : <Fragment>{currentClient._id ? <ListenerNotificationsScreen /> : <ValidateClientScreen />}</Fragment>}
+      {loading ? <LoaderScreen /> : <Fragment>{values.client.clientId ? <ListenerNotificationsScreen /> : <ValidateClientScreen />}</Fragment>}
     </AppContext.Provider>
   );
 };

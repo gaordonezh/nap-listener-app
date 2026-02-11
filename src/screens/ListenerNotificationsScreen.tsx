@@ -6,6 +6,9 @@ import Button from '../components/Button';
 import { sleep } from '../utils/functions';
 import Empty from '../components/Empty';
 import { usePermissionsContext } from '../context/PermissionsContext';
+import { useAppContext } from '../context/AppContext';
+import { handleLeaveClient } from '../services/requests';
+import { ClientProps } from '../types/global';
 
 const { NotificationModule } = NativeModules;
 
@@ -20,9 +23,8 @@ type NotificationItem = {
   eventType: string;
 };
 
-const counter = { value: 0 };
-
 const ListenerNotificationsScreen = () => {
+  const { client, setClient } = useAppContext();
   const { requestNotificationPermission, openNotificationListenerSettings } = usePermissionsContext();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [offset, setOffset] = useState(0);
@@ -116,6 +118,29 @@ const ListenerNotificationsScreen = () => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      setListenerLoading(true);
+
+      const isLogout = await handleLeaveClient(client);
+      if (!isLogout) throw new Error('Server error');
+
+      await NotificationModule.saveUserName('-');
+      setClient({} as ClientProps);
+    } catch (error) {
+      Alert.alert('No se logró cerrar sesión', 'Intente mas tarde o contacto con Netappperu SAC. ' + String(error));
+    } finally {
+      setListenerLoading(false);
+    }
+  };
+
+  const onLogout = () => {
+    Alert.alert('Cerrar sesión', 'Al continuar, la sesión se cerrará y la aplicación ya no registrará ninguna transación de Yape.', [
+      { text: 'Cancelar' },
+      { text: 'Cerrar sesión', onPress: handleLogout, isPreferred: true },
+    ]);
+  };
+
   const getLabelStatus = (status: boolean) => {
     if (listenerLoading) return '🟡 Pendiente';
     if (status) return '🟢 Activo';
@@ -139,6 +164,7 @@ const ListenerNotificationsScreen = () => {
           )}
           <View style={styles.allowedImgContainer}>
             <Button loading={syncing || listenerLoading} label="Sync" onPress={onSync} />
+            <Button loading={syncing || listenerLoading} label="⎋" onPress={onLogout} />
           </View>
         </View>
 

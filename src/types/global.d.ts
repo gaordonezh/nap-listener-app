@@ -1,5 +1,11 @@
 export interface ClientProps {
-  _id: string;
-  name: string;
+  clientId: string;
+  clientName: string;
+  phoneName: string;
+  phone: string;
+}
+
+export interface LogoutClientProps {
+  clientId: string;
   phone: string;
 }

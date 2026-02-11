@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { phoneNumberUtils } from '../utils/functions';
-import { handleGetClientData } from '../services/requests';
+import { handleInitializeClient } from '../services/requests';
 import { useAppContext } from '../context/AppContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MAIN_COLOR } from '../utils/constants';
@@ -18,8 +18,8 @@ const ValidateClientScreen = () => {
     try {
       setLoading(true);
 
-      const client = await handleGetClientData(phoneNumberUtils.clean(value));
-      if (!client) throw new Error('Número de celular no registrado');
+      const client = await handleInitializeClient(phoneNumberUtils.clean(value));
+      if (!client) throw new Error('Número de celular no registrado o no disponible');
 
       setClient(client);
     } catch (error: any) {
