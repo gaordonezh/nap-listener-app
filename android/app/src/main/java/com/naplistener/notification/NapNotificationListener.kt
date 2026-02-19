@@ -34,7 +34,9 @@ class NapNotificationListener : NotificationListenerService() {
             return
         }
 
-        if (!AllowedAppsStore.isAllowed(applicationContext, sbn.packageName)) {
+        val isAllowedApp = AllowedAppsStore.isAllowed(applicationContext, sbn.packageName)
+
+        if (!isAllowedApp) {
             return
         }
 

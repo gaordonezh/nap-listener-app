@@ -21,6 +21,11 @@ object AllowedAppsStore {
 
     fun isAllowed(context: Context, packageName: String): Boolean {
         val allowed = getAllowed(context)
-        return allowed.isEmpty() || allowed.contains(packageName)
+
+        if (allowed.isEmpty()) {
+            return false
+        }
+
+        return allowed.contains(packageName)
     }
 }

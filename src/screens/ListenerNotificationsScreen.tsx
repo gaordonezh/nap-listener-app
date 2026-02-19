@@ -96,9 +96,10 @@ const ListenerNotificationsScreen = () => {
   };
 
   const initAllowedApps = async () => {
-    const res: Array<string> = await NotificationModule.getAllowedPackages();
-    if (res.length) handleSetPackages(res);
-    else handleSetPackages([yapePackageName]);
+    // const res: Array<string> = await NotificationModule.getAllowedPackages();
+    // if (res.length) handleSetPackages(res);
+    // else handleSetPackages([yapePackageName]);
+    handleSetPackages([yapePackageName]);
   };
 
   const handleSetPackages = (pkgs: Array<string>) => {
@@ -126,6 +127,7 @@ const ListenerNotificationsScreen = () => {
       if (!isLogout) throw new Error('Server error');
 
       await NotificationModule.saveUserName('-');
+      handleSetPackages([yapePackageName]);
       setClient({} as ClientProps);
     } catch (error) {
       Alert.alert('No se logró cerrar sesión', 'Intente mas tarde o contacto con Netappperu SAC. ' + String(error));
@@ -160,7 +162,7 @@ const ListenerNotificationsScreen = () => {
               ))}
             </TouchableOpacity>
           ) : (
-            <Text style={styles.textWhite}>All Apps</Text>
+            <Text style={styles.textWhite}>Ninguna app a la escucha</Text>
           )}
           <View style={styles.allowedImgContainer}>
             <Button loading={syncing || listenerLoading} label="Sync" onPress={onSync} />

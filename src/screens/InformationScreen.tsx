@@ -14,7 +14,7 @@ const InformationScreen = ({ onCheck }: InformationScreenProps) => (
       <Text style={styles.main_loader_first_paragraph}>Bienvenido</Text>
     </View>
     <Text style={styles.main_loader_second_paragraph}>
-      Nap es una herramienta de uso interno para comercios y personal autorizado de Netappperu SAC.
+      Nap Listener es una herramienta de uso interno para comercios asociados y personal autorizado de Netappperu SAC.
     </Text>
 
     <Button label="CONTINUAR" onPress={onCheck} />
