@@ -178,7 +178,7 @@ const ListenerNotificationsScreen = () => {
               <Text style={styles.allowedListLabel}>Escucha de notificaciones:</Text>
             ) : (
               <Fragment>
-                <Text style={styles.allowedListLabel}>⚠️ Nap Listener dejó de tener acceso a las notificaciones ⚠️</Text>
+                <Text style={styles.allowedListLabel}>⚠️ Napcheck dejó de tener acceso a las notificaciones ⚠️</Text>
                 <Text style={styles.allowedListLabelWarning}>Android detuvo el acceso a notificaciones</Text>
                 <Text style={[styles.allowedListLabelInfo, { marginTop: 8 }]}>Recomendaciones:</Text>
                 <Text style={styles.allowedListLabelInfo}>— Excluir la app de optimización de batería</Text>

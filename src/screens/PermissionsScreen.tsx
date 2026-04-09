@@ -18,7 +18,7 @@ const PermissionsScreen = () => {
           <View style={{ gap: 32 }}>
             <Text style={[styles.subtitle]}>Acceso para el envío de notificaciones</Text>
             <Text style={[styles.subtitle, styles.textWhite]}>
-              Nap Listener necesita este permiso para validar el servicio de escucha de notificaciones
+              Napcheck necesita este permiso para validar el servicio de escucha de notificaciones
             </Text>
           </View>
           <Button label="Conceder permiso" size="large" onPress={requestNotificationPermission} />
@@ -30,7 +30,7 @@ const PermissionsScreen = () => {
           <View style={{ gap: 32 }}>
             <Text style={[styles.subtitle]}>Además necesitamos acceso a las notificaciones</Text>
             <Text style={[styles.subtitle, styles.textWhite]}>
-              Nap Listener necesita este permiso únicamente para detectar confirmaciones de pago provenientes de Yape y automatizar su registro en
+              Napcheck necesita este permiso únicamente para detectar confirmaciones de pago provenientes de Yape y automatizar su registro en
               nuestros sistemas internos.
             </Text>
             <Text style={[styles.subtitle, styles.textWhite]}>No leemos mensajes personales ni otras aplicaciones.</Text>

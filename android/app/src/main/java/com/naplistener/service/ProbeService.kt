@@ -18,7 +18,7 @@ class ProbeService : Service() {
 
     val channelId = "nap_probe"
 
-    val serviceName = "Nap Listener Health"
+    val serviceName = "Napcheck Health"
 
     val channel = NotificationChannel(channelId, serviceName, NotificationManager.IMPORTANCE_LOW)
     manager.createNotificationChannel(channel)
@@ -27,7 +27,7 @@ class ProbeService : Service() {
             NotificationCompat.Builder(this, channelId)
                     .setSmallIcon(R.drawable.ic_notification)
                     .setContentTitle(serviceName)
-                    .setContentText("Verificación de escucha de notificaciones de Nap Listener")
+                    .setContentText("Verificación de escucha de notificaciones de Napcheck")
                     .build()
 
     manager.notify(Random.nextInt(), notification)

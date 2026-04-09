@@ -5,7 +5,7 @@ const LoaderScreen = () => {
   return (
     <View style={styles.main_loader_container}>
       <View>
-        <Text style={styles.main_loader_title}>Nap Listener</Text>
+        <Text style={styles.main_loader_title}>Napcheck</Text>
         <Text style={styles.main_loader_first_paragraph}>Bienvenido</Text>
       </View>
       <ActivityIndicator size={75} color={MAIN_COLOR} />

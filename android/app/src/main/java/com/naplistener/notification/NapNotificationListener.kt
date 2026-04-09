@@ -29,7 +29,7 @@ class NapNotificationListener : NotificationListenerService() {
 
         val titleInit = sbn.notification.extras.getString("android.title")
 
-        if (titleInit == "Nap Listener Health") {
+        if (titleInit == "Napcheck Health") {
             ListenerProbeState.received = true
             return
         }

@@ -10,11 +10,11 @@ interface InformationScreenProps {
 const InformationScreen = ({ onCheck }: InformationScreenProps) => (
   <SafeAreaView style={styles.main_loader_container}>
     <View>
-      <Text style={styles.main_loader_title}>Nap Listener</Text>
+      <Text style={styles.main_loader_title}>Napcheck</Text>
       <Text style={styles.main_loader_first_paragraph}>Bienvenido</Text>
     </View>
     <Text style={styles.main_loader_second_paragraph}>
-      Nap Listener es una herramienta de uso interno para comercios asociados y personal autorizado de Netappperu SAC.
+      Napcheck es una herramienta de uso interno para comercios asociados y personal autorizado de Netappperu SAC.
     </Text>
 
     <Button label="CONTINUAR" onPress={onCheck} />

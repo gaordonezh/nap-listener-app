@@ -32,7 +32,7 @@ const ValidateClientScreen = () => {
   return (
     <SafeAreaView style={[styles.container]}>
       <View>
-        <Text style={styles.title}>Nap Listener</Text>
+        <Text style={styles.title}>Napcheck</Text>
         <Text style={styles.subtitle}>Bienvenido</Text>
       </View>
 

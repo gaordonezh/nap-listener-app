@@ -66,7 +66,7 @@ const PermissionsContextProvider = ({ children }: PropsWithChildren) => {
       Alert.alert(
         'Android detuvo el acceso a las notificaciones de Yape',
         `Para que la app siga registrando notificaciones, debes seguir los siguientes pasos:\n
-— Desactiva Nap Listener\n— Espera de 3 a 5 segundos\n— Activa de nuevo\n— Confirma el diálogo del sistema\n— Cierra por completo y vuelve a abrir Nap Listener.\n
+— Desactiva Napcheck\n— Espera de 3 a 5 segundos\n— Activa de nuevo\n— Confirma el diálogo del sistema\n— Cierra por completo y vuelve a abrir Napcheck.\n
 Después de esto, la app continuará registrando las notificaciones de Yape.`,
         [
           { text: 'Cancelar', style: 'cancel' },
